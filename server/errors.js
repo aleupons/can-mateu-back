@@ -9,11 +9,26 @@ const generateError = (message, code) => {
 };
 
 const validationErrors = (req, res, next) => {
+  const objectErrorMessages = (object) => {
+    let message = "";
+    const numberOfProperties = Object.keys(object).length;
+    let counter = 1;
+    for (const [key, value] of Object.entries(object)) {
+      if (counter === numberOfProperties) {
+        message += value.msg;
+      } else {
+        message += `${value.msg}, `;
+      }
+      counter++;
+    }
+    return message;
+  };
   const error = validationResult(req);
   if (!error.isEmpty()) {
-    const newError = generateError(error.mapped().id.msg, 400);
+    const newError = generateError(objectErrorMessages(error.mapped()), 400);
     return next(newError);
   }
+  next();
 };
 
 const serverError = (err, port) => {
