@@ -19,7 +19,7 @@ const dbConnection = (callback) => {
         return;
       }
       console.log(chalk.yellow("Connectant a la BBDD"));
-      /* callback(); */
+      callback();
     }
   );
 };
