@@ -1,5 +1,5 @@
-/* const debug = require("debug")("api-tipos");
-const connectarBD = require("./bd");
-const iniciaServidor = require("./servidor");
+const debug = require("debug")("can-mateu");
+const dbConnection = require("./db");
+/* const serverStart = require("./server"); */
 
-connectarBD(() => iniciaServidor()); */
+dbConnection();
