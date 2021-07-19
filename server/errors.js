@@ -17,9 +17,9 @@ const validationErrors = (req, res, next) => {
 };
 
 const serverError = (err, port) => {
-  debug(chalk.red("No s'ha pogut aixecar el servidor"));
+  console.log(chalk.red("No s'ha pogut aixecar el servidor"));
   if (err.code === "EADDRINUSE") {
-    debug(chalk.red(`El port ${chalk.red.bold(port)} està ocupat`));
+    console.log(chalk.red(`El port ${chalk.red.bold(port)} està ocupat`));
   }
 };
 
