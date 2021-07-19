@@ -1,5 +1,8 @@
-const { mongoose, Schema, model } = require("mongoose");
+const { SchemaTypes, Schema, model } = require("mongoose");
 require("mongoose-type-email");
+
+SchemaTypes.Email.defaults.message =
+  "L'adreça de correu electrònic és invàlida";
 
 const UserSchema = new Schema(
   {
@@ -25,7 +28,7 @@ const UserSchema = new Schema(
       unique: true,
     },
     email: {
-      type: mongoose.SchemaTypes.Email,
+      type: SchemaTypes.Email,
       required: true,
       unique: true,
     },
