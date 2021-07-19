@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const ShoppingCardSchema = new Schema(
+const ShoppingCartSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
@@ -33,10 +33,10 @@ const ShoppingCardSchema = new Schema(
   { versionKey: false }
 );
 
-const ShoppingCard = model(
-  "ShoppingCard",
-  ShoppingCardSchema,
-  "shopping-cards"
+const ShoppingCart = model(
+  "ShoppingCart",
+  ShoppingCartSchema,
+  "shopping-carts"
 );
 
-module.exports = ShoppingCard;
+module.exports = ShoppingCart;
