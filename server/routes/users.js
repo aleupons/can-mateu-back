@@ -10,6 +10,7 @@ const {
 } = require("../../db/controllers/users");
 const { validationErrors } = require("../errors");
 const userSchema = require("../checkSchemas/userSchema");
+const { duplicateKeyError } = require("../errors");
 
 const router = express.Router();
 
@@ -47,7 +48,7 @@ router.post(
       const newUser = await createUser(user);
       res.status(201).json(newUser);
     } catch (error) {
-      next(error);
+      duplicateKeyError(req, res, next, error);
     }
   }
 );
@@ -55,8 +56,8 @@ router.post(
 router.put(
   "/:id",
   check("id", "id incorrecta").isMongoId(),
-  checkSchema(userSchema),
-  validationErrors,
+  /* checkSchema(userSchema),
+  validationErrors, */
   async (req, res, next) => {
     const { id } = req.params;
     const user = req.body;
@@ -64,7 +65,7 @@ router.put(
       const modifiedUser = await modifyUser(id, user);
       res.json(modifiedUser);
     } catch (error) {
-      next(error);
+      duplicateKeyError(req, res, next, error);
     }
   }
 );

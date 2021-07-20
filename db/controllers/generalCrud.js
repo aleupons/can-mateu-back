@@ -9,9 +9,10 @@ const list = async (model, modelName) => {
     }
     return records;
   } catch (error) {
-    const newError = error.code
-      ? error
-      : generateError(`No es poden llistar els ${modelName}s`, 404);
+    const newError =
+      error.code || error.statusCode
+        ? error
+        : generateError(`No es poden llistar els ${modelName}s`, 404);
     throw newError;
   }
 };
@@ -25,9 +26,10 @@ const read = async (id, model, modelName) => {
     }
     return record;
   } catch (error) {
-    const newError = error.code
-      ? error
-      : generateError(`No es pot obtenir aquest ${modelName}`, 404);
+    const newError =
+      error.code || error.statusCode
+        ? error
+        : generateError(`No es pot obtenir aquest ${modelName}`, 404);
     throw newError;
   }
 };
@@ -37,12 +39,9 @@ const create = async (newData, model, modelName) => {
     const record = await model.create(newData);
     return record;
   } catch (error) {
-    if (error.code === 11000) {
-      throw generateError(error.message, 404);
-    }
     const newError = error.code
       ? error
-      : generateError(`No s'ha pogut crear el ${modelName}`, 404);
+      : generateError(`No s'ha pogut crear el ${modelName}`, 409);
     throw newError;
   }
 };
@@ -57,9 +56,10 @@ const update = async (id, modifiedData, model, modelName) => {
     const record = await model.findByIdAndUpdate(id, modifiedData);
     return record;
   } catch (error) {
-    const newError = error.code
-      ? error
-      : generateError(`No s'ha pogut modificar el ${modelName}`, 404);
+    const newError =
+      error.code || error.statusCode
+        ? error
+        : generateError(`No s'ha pogut modificar el ${modelName}`, 409);
     throw newError;
   }
 };
@@ -74,9 +74,10 @@ const deleteData = async (id, model, modelName) => {
     const deletedRecord = await model.findByIdAndDelete(id);
     return deletedRecord;
   } catch (error) {
-    const newError = error.code
-      ? error
-      : generateError(`No es pot eliminar aquest ${modelName}`, 404);
+    const newError =
+      error.code || error.statusCode
+        ? error
+        : generateError(`No es pot eliminar aquest ${modelName}`, 400);
     throw newError;
   }
 };
