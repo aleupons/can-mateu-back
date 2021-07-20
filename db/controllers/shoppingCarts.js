@@ -3,7 +3,7 @@ const { list, read, create, update, deleteData } = require("./generalCrud");
 
 const model = ShoppingCart;
 const modelName = "carro";
-const fieldsToPopulate = "products.productId";
+const fieldsToPopulate = "userId products.productId";
 
 const listShoppingCarts = async () => list(model, modelName, fieldsToPopulate);
 const showShoppingCart = async (shoppingCartId) =>
