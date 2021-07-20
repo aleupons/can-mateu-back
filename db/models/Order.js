@@ -1,4 +1,6 @@
 const { Schema, model } = require("mongoose");
+const User = require("./User");
+const ShoppingCart = require("./ShoppingCart");
 
 const OrderSchema = new Schema(
   {
@@ -7,9 +9,9 @@ const OrderSchema = new Schema(
       ref: "User",
       required: true,
     },
-    shoppingCardId: {
+    shoppingCartId: {
       type: Schema.Types.ObjectId,
-      ref: "ShoppingCard",
+      ref: "ShoppingCart",
       required: true,
       unique: true,
     },

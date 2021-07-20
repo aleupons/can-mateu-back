@@ -1,8 +1,8 @@
 const { generateError } = require("../../server/errors");
 
-const list = async (model, modelName) => {
+const list = async (model, modelName, fieldsToPopulate) => {
   try {
-    const records = await model.find();
+    const records = await model.find().populate(fieldsToPopulate);
     if (records.length === 0) {
       const newError = generateError(`No hi ha cap ${modelName}`, 404);
       throw newError;
@@ -16,9 +16,9 @@ const list = async (model, modelName) => {
   }
 };
 
-const read = async (id, model, modelName) => {
+const read = async (id, model, modelName, fieldsToPopulate) => {
   try {
-    const record = await model.findOne({ _id: id });
+    const record = await model.findOne({ _id: id }).populate(fieldsToPopulate);
     if (record === null) {
       const newError = generateError(`Aquest ${modelName} no existeix`, 404);
       throw newError;

@@ -3,9 +3,11 @@ const { list, read, create, update, deleteData } = require("./generalCrud");
 
 const model = Comment;
 const modelName = "comentari";
+const fieldsToPopulate = "productId userId";
 
-const listComments = async () => list(model, modelName);
-const showComment = async (commentId) => read(commentId, model, modelName);
+const listComments = async () => list(model, modelName, fieldsToPopulate);
+const showComment = async (commentId) =>
+  read(commentId, model, modelName, fieldsToPopulate);
 const createComment = async (newComment) =>
   create(newComment, model, modelName);
 const modifyComment = async (commentId, modifiedComment) =>
