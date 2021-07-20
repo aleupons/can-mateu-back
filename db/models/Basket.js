@@ -39,6 +39,10 @@ const BasketSchema = new Schema(
       ],
       required: true,
     },
+    stock: {
+      type: Number,
+      required: true,
+    },
     priceUnit: {
       type: Number,
       required: true,
