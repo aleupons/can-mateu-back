@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const Order = require("./Order");
 
 const PaymentSchema = new Schema(
   {
