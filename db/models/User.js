@@ -33,6 +33,10 @@ const UserSchema = new Schema(
       unique: true,
     },
     address: String,
+    isAdmin: {
+      type: Boolean,
+      required: true,
+    },
   },
   { versionKey: false }
 );
