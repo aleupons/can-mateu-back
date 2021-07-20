@@ -26,6 +26,7 @@ const UserSchema = new Schema(
     phone: {
       type: Number,
       unique: true,
+      sparse: true,
     },
     email: {
       type: SchemaTypes.Email,

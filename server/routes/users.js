@@ -24,8 +24,8 @@ router.get("/list", async (req, res, next) => {
 });
 
 router.get(
-  "/:id",
-  check("id", "id incorrecta").isMongoId(),
+  "/user/:id",
+  check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
     const { id } = req.params;
@@ -39,7 +39,7 @@ router.get(
 );
 
 router.post(
-  "/new-user",
+  "/user/new-user",
   checkSchema(userSchema),
   validationErrors,
   async (req, res, next) => {
@@ -54,10 +54,10 @@ router.post(
 );
 
 router.put(
-  "/:id",
-  check("id", "id incorrecta").isMongoId(),
-  /* checkSchema(userSchema),
-  validationErrors, */
+  "/user/:id",
+  check("id", "Id incorrecta").isMongoId(),
+  checkSchema(userSchema),
+  validationErrors,
   async (req, res, next) => {
     const { id } = req.params;
     const user = req.body;
@@ -71,8 +71,8 @@ router.put(
 );
 
 router.delete(
-  "/:id",
-  check("id", "id incorrecta").isMongoId(),
+  "/user/:id",
+  check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
     const { id } = req.params;
