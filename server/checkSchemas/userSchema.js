@@ -35,6 +35,10 @@ const userSchema = {
     isEmail: true,
     errorMessage: "Correu electrònic incorrecte",
   },
+  isAdmin: {
+    isBoolean: true,
+    errorMessage: "S'ha d'indicar si l'usuari és administrador o no",
+  },
 };
 
 module.exports = userSchema;
