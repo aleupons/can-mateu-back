@@ -4,8 +4,6 @@ const userSchema = {
     errorMessage: "El nom d'usuari ha de ser alfanumèric",
   },
   password: {
-    isAlphanumeric: true,
-    errorMessage: "La contrassenya ha de ser alfanumèrica",
     isLength: {
       options: {
         min: 6,
@@ -23,7 +21,14 @@ const userSchema = {
   },
   phone: {
     optional: true,
-    isMobilePhone: true,
+    isNumeric: true,
+    isLength: {
+      options: {
+        min: 9,
+        max: 9,
+      },
+      errorMessage: "El número de telèfon ha de tenir 9 dígits",
+    },
     errorMessage: "Número de telèfon incorrecte",
   },
   email: {
