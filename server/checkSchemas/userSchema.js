@@ -21,19 +21,19 @@ const userSchema = {
     isAlpha: true,
     errorMessage: "Els cognoms només poden contenir caràcters",
   },
-  optional: {
-    phone: {
-      isMobilePhone: true,
-      errorMessage: "Número de telèfon incorrecte",
-    },
-    address: {
-      isAlpha: true,
-      errorMessage: "Adreça incorrecta",
-    },
+  phone: {
+    optional: true,
+    isMobilePhone: true,
+    errorMessage: "Número de telèfon incorrecte",
   },
   email: {
     isEmail: true,
     errorMessage: "Correu electrònic incorrecte",
+  },
+  address: {
+    optional: true,
+    isAlpha: true,
+    errorMessage: "Adreça incorrecta",
   },
   isAdmin: {
     isBoolean: true,

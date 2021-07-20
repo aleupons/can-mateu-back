@@ -18,7 +18,7 @@ const dbConnection = (callback) => {
         console.log(chalk.red(err.message));
         return;
       }
-      console.log(chalk.yellow("Connectant a la BBDD"));
+      console.log(chalk.yellow("Connectat a la BBDD"));
       callback();
     }
   );
