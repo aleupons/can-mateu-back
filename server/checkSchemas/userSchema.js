@@ -1,6 +1,6 @@
 const userSchema = {
   username: {
-    isAlphanumeric: true,
+    matches: /^[a-zA-Z0-9]+$/,
     errorMessage: "El nom d'usuari ha de ser alfanumèric",
   },
   password: {
@@ -12,11 +12,11 @@ const userSchema = {
     },
   },
   name: {
-    isAlpha: true,
+    matches: /^[a-zA-Z ]*$/,
     errorMessage: "El nom només pot contenir caràcters",
   },
   surnames: {
-    isAlpha: true,
+    matches: /^[a-zA-Z ]*$/,
     errorMessage: "Els cognoms només poden contenir caràcters",
   },
   phone: {
@@ -37,7 +37,7 @@ const userSchema = {
   },
   address: {
     optional: true,
-    isAlpha: true,
+    matches: /^[a-zA-Z ]*$/,
     errorMessage: "Adreça incorrecta",
   },
   isAdmin: {

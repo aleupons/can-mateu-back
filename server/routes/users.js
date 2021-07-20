@@ -39,7 +39,7 @@ router.get(
 );
 
 router.post(
-  "/user/new-user",
+  "/new-user",
   checkSchema(userSchema),
   validationErrors,
   async (req, res, next) => {

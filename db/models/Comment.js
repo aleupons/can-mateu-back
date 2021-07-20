@@ -8,7 +8,6 @@ const CommentSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Product",
       required: true,
-      unique: true,
     },
     userId: {
       type: Schema.Types.ObjectId,
