@@ -21,7 +21,6 @@ const BasketSchema = new Schema(
           name: {
             type: String,
             required: true,
-            unique: true,
           },
           description: {
             type: String,
@@ -37,7 +36,6 @@ const BasketSchema = new Schema(
           },
         },
       ],
-      required: true,
     },
     stock: {
       type: Number,

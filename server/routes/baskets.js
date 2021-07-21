@@ -8,8 +8,11 @@ const {
   modifyBasket,
   deleteBasket,
 } = require("../../db/controllers/baskets");
-const { validationErrors } = require("../errors");
-const basketSchema = require("../checkSchemas/basketSchema");
+const { validationErrors, generateError } = require("../errors");
+const {
+  basketSchema,
+  basketProductSchema,
+} = require("../checkSchemas/basketSchema");
 const { duplicateKeyError } = require("../errors");
 
 const router = express.Router();
@@ -38,9 +41,7 @@ router.get(
   }
 );
 
-/* AFEGIR O TREURE PRODUCTES DE LA CISTELLA */
-
-/* router.post(
+router.post(
   "/new-basket",
   checkSchema(basketSchema),
   validationErrors,
@@ -70,7 +71,73 @@ router.put(
       duplicateKeyError(req, res, next, error);
     }
   }
-); */
+);
+
+/* AFEGIR O TREURE PRODUCTES DE LA CISTELLA */
+
+router.put(
+  "/basket/add/:id",
+  check("id", "Id incorrecta").isMongoId(),
+  checkSchema(basketProductSchema),
+  validationErrors,
+  async (req, res, next) => {
+    const { id } = req.params;
+    const basketProduct = req.body;
+    try {
+      const basket = await showBasket(id);
+      console.log(basketProduct._id === false);
+      if (basketProduct._id !== undefined) {
+        // Si la cistella ja té el producte
+        const products = basket.basketProducts.map((productToModify) => {
+          if (productToModify._id.equals(basketProduct._id)) {
+            productToModify = basketProduct;
+          }
+          return productToModify;
+        });
+        basket.basketProducts = products;
+      } else {
+        // Si la cistella no té el producte
+        basket.basketProducts.push(basketProduct);
+      }
+      const modifiedBasket = await modifyBasket(id, basket);
+      res.json(modifiedBasket);
+    } catch (error) {
+      duplicateKeyError(req, res, next, error);
+    }
+  }
+);
+
+router.put(
+  "/basket/remove/:id",
+  check("id", "Id incorrecta").isMongoId(),
+  validationErrors,
+  async (req, res, next) => {
+    const { id } = req.params;
+    const { _id: basketProductId } = req.body;
+    try {
+      const basket = await showBasket(id);
+      if (
+        basket.basketProducts.find((existsProduct) =>
+          existsProduct._id.equals(basketProductId)
+        )
+      ) {
+        // Si la cistella ja té el producte
+        basket.basketProducts = basket.basketProducts.filter(
+          (productToModify) => !productToModify._id.equals(basketProductId)
+        );
+      } else {
+        // Si la cistella no té el producte
+        throw generateError("Aquest producte no està a la cistella", 400);
+      }
+      const modifiedBasket = await modifyBasket(id, basket);
+      res.json(modifiedBasket);
+    } catch (error) {
+      duplicateKeyError(req, res, next, error);
+    }
+  }
+);
+
+/* */
 
 router.delete(
   "/basket/:id",
