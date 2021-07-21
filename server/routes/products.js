@@ -3,6 +3,9 @@ const express = require("express");
 const debug = require("debug")("can-mateu:server:routes:products");
 const {
   listProducts,
+  listProductsByName,
+  listProductsByCategory,
+  listProductsAndOrderBy,
   showProduct,
   createProduct,
   modifyProduct,
@@ -22,6 +25,40 @@ router.get("/list", async (req, res, next) => {
     next(error);
   }
 });
+
+/* ORDENAR I FILTRAR LLISTES */
+
+router.get("/list-by-name/:name", async (req, res, next) => {
+  const { name } = req.params;
+  try {
+    const productsList = await listProductsByName(name);
+    res.json(productsList);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/list-by-category/:category", async (req, res, next) => {
+  const { category } = req.params;
+  try {
+    const productsList = await listProductsByCategory(category);
+    res.json(productsList);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/list-by-field/:field", async (req, res, next) => {
+  const { field } = req.params;
+  try {
+    const productsList = await listProductsAndOrderBy(field);
+    res.json(productsList);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/* */
 
 router.get(
   "/product/:id",
