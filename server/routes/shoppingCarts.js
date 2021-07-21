@@ -8,9 +8,13 @@ const {
   modifyShoppingCart,
   deleteShoppingCart,
 } = require("../../db/controllers/shoppingCarts");
+const { showProduct } = require("../../db/controllers/products");
 const { validationErrors } = require("../errors");
-const shoppingCartSchema = require("../checkSchemas/shoppingCartSchema");
-const { duplicateKeyError } = require("../errors");
+const {
+  shoppingCartSchema,
+  shoppingCartProductSchema,
+} = require("../checkSchemas/shoppingCartSchema");
+const { generateError, duplicateKeyError } = require("../errors");
 
 const router = express.Router();
 
@@ -38,9 +42,7 @@ router.get(
   }
 );
 
-/* AFEGIR O TREURE PRODUCTES DEL CARRO */
-
-/* router.post(
+router.post(
   "/new-shopping-cart",
   checkSchema(shoppingCartSchema),
   validationErrors,
@@ -55,22 +57,52 @@ router.get(
   }
 );
 
+/* AFEGIR I TREURE PRODUCTES DEL CARRO */
+
 router.put(
-  "/shopping-cart/:id",
+  "/shopping-cart/add/:id",
   check("id", "Id incorrecta").isMongoId(),
-  checkSchema(shoppingCartSchema),
+  checkSchema(shoppingCartProductSchema),
   validationErrors,
   async (req, res, next) => {
     const { id } = req.params;
-    const shoppingCart = req.body;
+    const { productId, amount } = req.body;
     try {
+      const shoppingCart = await showShoppingCart(id);
+      if (await showProduct(productId)) {
+        shoppingCart.products.push({ productId, amount });
+      } else {
+        throw generateError("Aquest producte no existeix", 400);
+      }
       const modifiedShoppingCart = await modifyShoppingCart(id, shoppingCart);
       res.json(modifiedShoppingCart);
     } catch (error) {
       duplicateKeyError(req, res, next, error);
     }
   }
-); */
+);
+
+router.put(
+  "/shopping-cart/remove/:id",
+  check("id", "Id incorrecta").isMongoId(),
+  validationErrors,
+  async (req, res, next) => {
+    const { id } = req.params;
+    const { _id: objectId } = req.body;
+    try {
+      const shoppingCart = await showShoppingCart(id);
+      shoppingCart.products = shoppingCart.products.filter(
+        (product) => product._id !== objectId
+      );
+      const modifiedShoppingCart = await modifyShoppingCart(id, shoppingCart);
+      res.json(modifiedShoppingCart);
+    } catch (error) {
+      duplicateKeyError(req, res, next, error);
+    }
+  }
+);
+
+/* */
 
 router.delete(
   "/shopping-cart/:id",

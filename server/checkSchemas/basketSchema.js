@@ -10,6 +10,10 @@ const basketSchema = {
     matches: /^[a-zA-Z ]*$/,
     errorMessage: "La descripció només pot contenir lletres",
   },
+  basketProducts: {
+    isArray: true,
+    errorMessage: "Els productes no són correctes",
+  },
   stock: {
     isNumeric: true,
     errorMessage: "Les unitats en stock han de ser un número",

@@ -13,4 +13,15 @@ const shoppingCartSchema = {
   },
 };
 
-module.exports = shoppingCartSchema;
+const shoppingCartProductSchema = {
+  productId: {
+    isMongoId: true,
+    errorMessage: "El producte no és correcte",
+  },
+  amount: {
+    isNumeric: true,
+    errorMessage: "La quantitat del producte no és correcta",
+  },
+};
+
+module.exports = { shoppingCartSchema, shoppingCartProductSchema };
