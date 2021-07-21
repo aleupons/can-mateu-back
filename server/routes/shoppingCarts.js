@@ -84,9 +84,11 @@ router.put(
             return productToQuantify;
           });
           shoppingCart.products = products;
+          // shoppingCart.price PREU TOTAL (per BBDD, per back o per front?)
         } else {
           // Si el carro no té el producte
           shoppingCart.products.push({ productId, amount });
+          // shoppingCart.price PREU TOTAL (per BBDD, per back o per front?)
         }
       } else {
         throw generateError("Aquest producte no existeix", 400);
@@ -111,15 +113,15 @@ router.put(
       const product = await showProduct(productId);
       if (product) {
         if (
-          !shoppingCart.products.find((existsProduct) =>
+          shoppingCart.products.find((existsProduct) =>
             existsProduct.productId._id.equals(productId)
           )
         ) {
-          throw generateError("Aquest producte no està al carro", 400);
-        } else {
           shoppingCart.products = shoppingCart.products.filter(
             (product) => !product.productId._id.equals(productId)
           );
+        } else {
+          throw generateError("Aquest producte no està al carro", 400);
         }
       } else {
         throw generateError("Aquest producte no existeix", 400);

@@ -45,4 +45,28 @@ const basketSchema = {
   },
 };
 
-module.exports = basketSchema;
+const basketProductSchema = {
+  _id: {
+    optional: true,
+    isMongoId: true,
+    errorMessage: "L'id del producte no és correcta",
+  },
+  name: {
+    matches: /^[a-zA-Z ]*$/,
+    errorMessage: "El nom només pot contenir lletres",
+  },
+  description: {
+    matches: /^[a-zA-Z ]*$/,
+    errorMessage: "La descripció només pot contenir lletres",
+  },
+  amount: {
+    isNumeric: true,
+    errorMessage: "La quantitat del producte no és correcta",
+  },
+  unit: {
+    isAlpha: true,
+    errorMessage: "Les unitats només poden contenir lletres",
+  },
+};
+
+module.exports = { basketSchema, basketProductSchema };
