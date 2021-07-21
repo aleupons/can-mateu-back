@@ -1,7 +1,10 @@
 const { check, checkSchema } = require("express-validator");
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const debug = require("debug")("can-mateu:server:routes:users");
 const {
+  loginUser,
+  listAdminUsers,
   listUsers,
   showUser,
   createUser,
@@ -11,10 +14,33 @@ const {
 const { validationErrors } = require("../errors");
 const userSchema = require("../checkSchemas/userSchema");
 const { duplicateKeyError } = require("../errors");
+const authorization = require("../authorization");
 
 const router = express.Router();
 
-router.get("/list", async (req, res, next) => {
+router.post("/login", async (req, res, next) => {
+  const { username, password } = req.body;
+  try {
+    const userId = await loginUser(username, password);
+    const token = jwt.sign({ userId }, process.env.SECRET_JWT, {
+      expiresIn: "1w",
+    });
+    res.json({ token });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/list-admins", authorization, async (req, res, next) => {
+  try {
+    const adminsList = await listAdminUsers();
+    res.json(adminsList);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/list", authorization, async (req, res, next) => {
   try {
     const usersList = await listUsers();
     res.json(usersList);
@@ -25,6 +51,7 @@ router.get("/list", async (req, res, next) => {
 
 router.get(
   "/user/:id",
+  authorization,
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
@@ -55,6 +82,7 @@ router.post(
 
 router.put(
   "/user/:id",
+  authorization,
   check("id", "Id incorrecta").isMongoId(),
   checkSchema(userSchema),
   validationErrors,
@@ -72,6 +100,7 @@ router.put(
 
 router.delete(
   "/user/:id",
+  authorization,
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {

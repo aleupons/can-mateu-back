@@ -15,10 +15,11 @@ const {
   shoppingCartProductSchema,
 } = require("../checkSchemas/shoppingCartSchema");
 const { generateError, duplicateKeyError } = require("../errors");
+const authorization = require("../authorization");
 
 const router = express.Router();
 
-router.get("/list", async (req, res, next) => {
+router.get("/list", authorization, async (req, res, next) => {
   try {
     const shoppingCartsList = await listShoppingCarts();
     res.json(shoppingCartsList);

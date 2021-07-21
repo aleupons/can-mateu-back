@@ -8,7 +8,7 @@ const app = express();
 
 const port = process.env.PORT || process.env.SERVER_PORT || 4000;
 
-const serverStart = () => {
+const serverInit = () => {
   const server = app.listen(port, () => {
     console.log(chalk.yellow(`\nServidor actiu al port ${port}`));
   });
@@ -16,4 +16,4 @@ const serverStart = () => {
   server.on("error", (err) => serverError(err, port));
 };
 
-module.exports = { app, serverStart };
+module.exports = { app, serverInit };

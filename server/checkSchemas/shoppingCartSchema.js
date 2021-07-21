@@ -1,5 +1,6 @@
 const shoppingCartSchema = {
   userId: {
+    optional: true,
     isMongoId: true,
     errorMessage: "L'usuari no és correcte",
   },

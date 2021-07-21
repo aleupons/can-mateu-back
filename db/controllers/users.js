@@ -30,6 +30,22 @@ const loginUser = async (username, password) => {
   }
 };
 
+const listAdminUsers = async () => {
+  try {
+    const adminUsers = await User.find({ isAdmin: true });
+    if (adminUsers.length === 0) {
+      const newError = generateError("No hi ha cap administrador", 404);
+      throw newError;
+    }
+    return adminUsers;
+  } catch (error) {
+    const newError = error.statusCode
+      ? error
+      : generateError("No es poden llistar els administradors", 404);
+    throw newError;
+  }
+};
+
 const listUsers = async () => {
   const users = await list(model, modelName);
   const usersObj = users.map((user) => {
@@ -65,6 +81,7 @@ const deleteUser = async (userId) => deleteData(userId, model, modelName);
 
 module.exports = {
   loginUser,
+  listAdminUsers,
   listUsers,
   showUser,
   createUser,
