@@ -17,7 +17,6 @@ const ShoppingCartSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "Product",
             required: true,
-            unique: true,
           },
           amount: {
             type: Number,
@@ -35,10 +34,6 @@ const ShoppingCartSchema = new Schema(
   { versionKey: false }
 );
 
-const ShoppingCart = model(
-  "ShoppingCart",
-  ShoppingCartSchema,
-  "shopping-carts"
-);
+const ShoppingCart = model("ShoppingCart", ShoppingCartSchema, "shoppingCarts");
 
 module.exports = ShoppingCart;
