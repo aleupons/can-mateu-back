@@ -69,8 +69,25 @@ router.put(
     const { productId, amount } = req.body;
     try {
       const shoppingCart = await showShoppingCart(id);
-      if (await showProduct(productId)) {
-        shoppingCart.products.push({ productId, amount });
+      const product = await showProduct(productId);
+      if (product) {
+        // Si existeix el producte que ens passen
+        const productToModify = shoppingCart.products.find((existsProduct) =>
+          existsProduct.productId._id.equals(productId)
+        );
+        if (productToModify) {
+          // Si el carro ja té el producte
+          const products = shoppingCart.products.map((productToQuantify) => {
+            if (productToQuantify.productId._id.equals(productId)) {
+              productToQuantify.amount = amount;
+            }
+            return productToQuantify;
+          });
+          shoppingCart.products = products;
+        } else {
+          // Si el carro no té el producte
+          shoppingCart.products.push({ productId, amount });
+        }
       } else {
         throw generateError("Aquest producte no existeix", 400);
       }
@@ -88,12 +105,25 @@ router.put(
   validationErrors,
   async (req, res, next) => {
     const { id } = req.params;
-    const { _id: objectId } = req.body;
+    const { productId } = req.body;
     try {
       const shoppingCart = await showShoppingCart(id);
-      shoppingCart.products = shoppingCart.products.filter(
-        (product) => product._id !== objectId
-      );
+      const product = await showProduct(productId);
+      if (product) {
+        if (
+          !shoppingCart.products.find((existsProduct) =>
+            existsProduct.productId._id.equals(productId)
+          )
+        ) {
+          throw generateError("Aquest producte no està al carro", 400);
+        } else {
+          shoppingCart.products = shoppingCart.products.filter(
+            (product) => !product.productId._id.equals(productId)
+          );
+        }
+      } else {
+        throw generateError("Aquest producte no existeix", 400);
+      }
       const modifiedShoppingCart = await modifyShoppingCart(id, shoppingCart);
       res.json(modifiedShoppingCart);
     } catch (error) {

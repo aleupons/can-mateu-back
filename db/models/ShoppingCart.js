@@ -8,6 +8,7 @@ const ShoppingCartSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      unique: true,
     },
     products: {
       type: [
@@ -16,6 +17,7 @@ const ShoppingCartSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: "Product",
             required: true,
+            unique: true,
           },
           amount: {
             type: Number,
@@ -23,7 +25,6 @@ const ShoppingCartSchema = new Schema(
           },
         },
       ],
-      required: true,
     },
     price: {
       type: Number,
