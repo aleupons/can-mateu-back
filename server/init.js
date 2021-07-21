@@ -6,9 +6,9 @@ const { serverError } = require("./errors");
 
 const app = express();
 
-const serverInit = () => {
-  const port = process.env.PORT || process.env.SERVER_PORT || 4000;
+const port = process.env.PORT || process.env.SERVER_PORT || 4000;
 
+const serverInit = () => {
   const server = app.listen(port, () => {
     console.log(chalk.yellow(`\nServidor actiu al port ${port}`));
   });
