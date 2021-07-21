@@ -3,6 +3,9 @@ const express = require("express");
 const debug = require("debug")("can-mateu:server:routes:baskets");
 const {
   listBaskets,
+  listBasketsByName,
+  listBasketsByCategory,
+  listBasketsAndOrderBy,
   showBasket,
   createBasket,
   modifyBasket,
@@ -14,6 +17,7 @@ const {
   basketProductSchema,
 } = require("../checkSchemas/basketSchema");
 const { duplicateKeyError } = require("../errors");
+const authorization = require("../authorization");
 
 const router = express.Router();
 
@@ -25,6 +29,40 @@ router.get("/list", async (req, res, next) => {
     next(error);
   }
 });
+
+/* ORDENAR I FILTRAR LLISTES */
+
+router.get("/list-by-name/:name", async (req, res, next) => {
+  const { name } = req.params;
+  try {
+    const basketsList = await listBasketsByName(name);
+    res.json(basketsList);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/list-by-category/:category", async (req, res, next) => {
+  const { category } = req.params;
+  try {
+    const basketsList = await listBasketsByCategory(category);
+    res.json(basketsList);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/list-by-field/:field", async (req, res, next) => {
+  const { field } = req.params;
+  try {
+    const basketsList = await listBasketsAndOrderBy(field);
+    res.json(basketsList);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/* */
 
 router.get(
   "/basket/:id",
@@ -43,6 +81,7 @@ router.get(
 
 router.post(
   "/new-basket",
+  authorization,
   checkSchema(basketSchema),
   validationErrors,
   async (req, res, next) => {
@@ -58,6 +97,7 @@ router.post(
 
 router.put(
   "/basket/:id",
+  authorization,
   check("id", "Id incorrecta").isMongoId(),
   checkSchema(basketSchema),
   validationErrors,
@@ -77,6 +117,7 @@ router.put(
 
 router.put(
   "/basket/add/:id",
+  authorization,
   check("id", "Id incorrecta").isMongoId(),
   checkSchema(basketProductSchema),
   validationErrors,
@@ -109,6 +150,7 @@ router.put(
 
 router.put(
   "/basket/remove/:id",
+  authorization,
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
@@ -141,6 +183,7 @@ router.put(
 
 router.delete(
   "/basket/:id",
+  authorization,
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {

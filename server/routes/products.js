@@ -14,6 +14,7 @@ const {
 const { validationErrors } = require("../errors");
 const productSchema = require("../checkSchemas/productSchema");
 const { duplicateKeyError } = require("../errors");
+const authorization = require("../authorization");
 
 const router = express.Router();
 
@@ -77,6 +78,7 @@ router.get(
 
 router.post(
   "/new-product",
+  authorization,
   checkSchema(productSchema),
   validationErrors,
   async (req, res, next) => {
@@ -92,6 +94,7 @@ router.post(
 
 router.put(
   "/product/:id",
+  authorization,
   check("id", "Id incorrecta").isMongoId(),
   checkSchema(productSchema),
   validationErrors,
@@ -109,6 +112,7 @@ router.put(
 
 router.delete(
   "/product/:id",
+  authorization,
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
