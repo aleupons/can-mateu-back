@@ -15,15 +15,15 @@ const {
 const { validationErrors } = require("../errors");
 const userSchema = require("../checkSchemas/userSchema");
 const { duplicateKeyError } = require("../errors");
-const authorization = require("../authorization");
+const { authorization } = require("../authorization");
 
 const router = express.Router();
 
 router.post("/login", async (req, res, next) => {
   const { username, password } = req.body;
   try {
-    const userId = await loginUser(username, password);
-    const token = jwt.sign({ userId }, process.env.SECRET_JWT, {
+    const { userId, admin } = await loginUser(username, password);
+    const token = jwt.sign({ userId, admin }, process.env.SECRET_JWT, {
       expiresIn: "1w",
     });
     res.json({ token });
@@ -32,7 +32,7 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
-router.get("/list-admins", authorization, async (req, res, next) => {
+router.get("/list-admins", authorization(true), async (req, res, next) => {
   try {
     const adminsList = await listAdminUsers();
     res.json(adminsList);
@@ -41,7 +41,7 @@ router.get("/list-admins", authorization, async (req, res, next) => {
   }
 });
 
-router.get("/list", authorization, async (req, res, next) => {
+router.get("/list", authorization(true), async (req, res, next) => {
   try {
     const usersList = await listUsers();
     res.json(usersList);

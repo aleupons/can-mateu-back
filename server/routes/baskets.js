@@ -17,7 +17,7 @@ const {
   basketProductSchema,
 } = require("../checkSchemas/basketSchema");
 const { duplicateKeyError } = require("../errors");
-const authorization = require("../authorization");
+const { authorization } = require("../authorization");
 
 const router = express.Router();
 
@@ -81,7 +81,7 @@ router.get(
 
 router.post(
   "/new-basket",
-  authorization,
+  authorization(true),
   checkSchema(basketSchema),
   validationErrors,
   async (req, res, next) => {
@@ -97,7 +97,7 @@ router.post(
 
 router.put(
   "/basket/:id",
-  authorization,
+  authorization(true),
   check("id", "Id incorrecta").isMongoId(),
   checkSchema(basketSchema),
   validationErrors,
@@ -117,7 +117,7 @@ router.put(
 
 router.put(
   "/basket/add/:id",
-  authorization,
+  authorization(true),
   check("id", "Id incorrecta").isMongoId(),
   checkSchema(basketProductSchema),
   validationErrors,
@@ -150,7 +150,7 @@ router.put(
 
 router.put(
   "/basket/remove/:id",
-  authorization,
+  authorization(true),
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
@@ -183,7 +183,7 @@ router.put(
 
 router.delete(
   "/basket/:id",
-  authorization,
+  authorization(true),
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {

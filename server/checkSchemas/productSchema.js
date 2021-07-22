@@ -1,7 +1,4 @@
 const productSchema = {
-  photoUrl: {
-    errorMessage: "La url de la foto només pot contenir lletres",
-  },
   name: {
     matches: /^[a-zA-Z ]*$/,
     errorMessage: "El nom només pot contenir lletres",

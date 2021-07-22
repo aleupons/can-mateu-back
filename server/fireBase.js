@@ -34,6 +34,7 @@ const fireBase = async (req, res, next, manageData, register) => {
       const newData = await manageData({ ...register, photoUrl });
       res.status(201).json(newData);
     } catch (error) {
+      console.log(error.message);
       duplicateKeyError(req, res, next, error);
     }
   });

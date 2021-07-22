@@ -15,7 +15,7 @@ const {
   shoppingCartProductSchema,
 } = require("../checkSchemas/shoppingCartSchema");
 const { generateError, duplicateKeyError } = require("../errors");
-const authorization = require("../authorization");
+const { authorization } = require("../authorization");
 
 const router = express.Router();
 

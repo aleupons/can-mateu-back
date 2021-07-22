@@ -14,7 +14,7 @@ const couponsRoute = require("./routes/coupons");
 const commentsRoute = require("./routes/comments");
 const basketsRoute = require("./routes/baskets");
 const { error404, generalError } = require("./errors");
-const authorization = require("./authorization");
+const { authorization } = require("./authorization");
 
 const serverStart = () => {
   serverInit();
@@ -28,8 +28,8 @@ const serverStart = () => {
   app.use("/products", productsRoute);
   app.use("/payments", authorization, paymentsRoute);
   app.use("/orders", authorization, ordersRoute);
-  app.use("/coupons", authorization, couponsRoute);
-  app.use("/comments", authorization, commentsRoute);
+  app.use("/coupons", authorization(true), couponsRoute);
+  app.use("/comments", commentsRoute);
   app.use("/baskets", basketsRoute);
 
   app.use(error404);

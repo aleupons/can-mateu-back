@@ -15,7 +15,7 @@ const {
 const { validationErrors } = require("../errors");
 const productSchema = require("../checkSchemas/productSchema");
 const { duplicateKeyError } = require("../errors");
-const authorization = require("../authorization");
+const { authorization } = require("../authorization");
 const fireBase = require("../fireBase");
 
 const router = express.Router();
@@ -81,19 +81,23 @@ router.get(
 
 router.post(
   "/new-product",
-  /* authorization, */
+  authorization(true),
   checkSchema(productSchema),
   validationErrors,
   upload.single("photoUrl"),
   async (req, res, next) => {
     const product = req.body;
-    fireBase(req, res, next, createProduct, product);
+    try {
+      fireBase(req, res, next, createProduct, product);
+    } catch (error) {
+      next(error);
+    }
   }
 );
 
 router.put(
   "/product/:id",
-  authorization,
+  authorization(true),
   check("id", "Id incorrecta").isMongoId(),
   checkSchema(productSchema),
   validationErrors,
@@ -111,7 +115,7 @@ router.put(
 
 router.delete(
   "/product/:id",
-  authorization,
+  authorization(true),
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
