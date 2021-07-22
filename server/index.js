@@ -26,8 +26,8 @@ const serverStart = () => {
   app.use("/users", usersRoute);
   app.use("/shopping-carts", shoppingCartsRoute);
   app.use("/products", productsRoute);
-  app.use("/payments", authorization, paymentsRoute);
-  app.use("/orders", authorization, ordersRoute);
+  app.use("/payments", authorization(false), paymentsRoute);
+  app.use("/orders", authorization(false), ordersRoute);
   app.use("/coupons", authorization(true), couponsRoute);
   app.use("/comments", commentsRoute);
   app.use("/baskets", basketsRoute);

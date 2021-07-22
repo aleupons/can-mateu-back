@@ -52,7 +52,7 @@ router.get("/list", authorization(true), async (req, res, next) => {
 
 router.get(
   "/user/:id",
-  authorization,
+  authorization(false),
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
@@ -83,7 +83,7 @@ router.post(
 
 router.put(
   "/user/:id",
-  authorization,
+  authorization(false),
   check("id", "Id incorrecta").isMongoId(),
   checkSchema(userSchema),
   validationErrors,
@@ -101,7 +101,7 @@ router.put(
 
 router.delete(
   "/user/:id",
-  authorization,
+  authorization(false),
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
