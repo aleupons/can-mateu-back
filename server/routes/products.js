@@ -1,6 +1,7 @@
 const { check, checkSchema } = require("express-validator");
 const express = require("express");
 const debug = require("debug")("can-mateu:server:routes:products");
+const multer = require("multer");
 const {
   listProducts,
   listProductsByName,
@@ -15,8 +16,10 @@ const { validationErrors } = require("../errors");
 const productSchema = require("../checkSchemas/productSchema");
 const { duplicateKeyError } = require("../errors");
 const authorization = require("../authorization");
+const fireBase = require("../fireBase");
 
 const router = express.Router();
+const upload = multer();
 
 router.get("/list", async (req, res, next) => {
   try {
@@ -78,17 +81,13 @@ router.get(
 
 router.post(
   "/new-product",
-  authorization,
+  /* authorization, */
   checkSchema(productSchema),
   validationErrors,
+  upload.single("photoUrl"),
   async (req, res, next) => {
     const product = req.body;
-    try {
-      const newProduct = await createProduct(product);
-      res.status(201).json(newProduct);
-    } catch (error) {
-      duplicateKeyError(req, res, next, error);
-    }
+    fireBase(req, res, next, createProduct, product);
   }
 );
 
