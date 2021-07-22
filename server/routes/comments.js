@@ -41,7 +41,7 @@ router.get(
 
 router.post(
   "/new-comment",
-  authorization,
+  authorization(false),
   checkSchema(commentSchema),
   validationErrors,
   async (req, res, next) => {
@@ -57,7 +57,7 @@ router.post(
 
 router.put(
   "/comment/:id",
-  authorization,
+  authorization(false),
   check("id", "Id incorrecta").isMongoId(),
   checkSchema(commentSchema),
   validationErrors,
@@ -75,7 +75,7 @@ router.put(
 
 router.delete(
   "/comment/:id",
-  authorization,
+  authorization(false),
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {

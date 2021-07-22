@@ -19,7 +19,7 @@ const { authorization } = require("../authorization");
 
 const router = express.Router();
 
-router.get("/list", authorization, async (req, res, next) => {
+router.get("/list", authorization(false), async (req, res, next) => {
   try {
     const shoppingCartsList = await listShoppingCarts();
     res.json(shoppingCartsList);

@@ -65,8 +65,8 @@ router.get("/list-by-field/:field", async (req, res, next) => {
 
 router.get(
   "/list-recommended/:userId",
-  authorization,
-  check("id", "Id incorrecta").isMongoId(),
+  authorization(false),
+  check("userId", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
     const { id } = req.params;
