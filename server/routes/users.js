@@ -2,6 +2,7 @@ const { check, checkSchema } = require("express-validator");
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const debug = require("debug")("can-mateu:server:routes:users");
+require("dotenv").config();
 const {
   loginUser,
   listAdminUsers,
