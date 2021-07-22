@@ -18,7 +18,7 @@ const loginUser = async (username, password) => {
       const newError = generateError("Credencials incorrectes", 403);
       throw newError;
     }
-    return user._id;
+    return { userId: user._id, admin: user.isAdmin };
   } catch (error) {
     const newError = error.statusCode
       ? error
@@ -75,8 +75,12 @@ const createUser = async (newUser) => {
   }
 };
 
-const modifyUser = async (userId, modifiedUser) =>
-  update(userId, modifiedUser, model, modelName);
+const modifyUser = async (userId, modifiedUser) => {
+  const encryptedPassword = await bcrypt.hash(modifiedUser.password, 10);
+  modifiedUser.password = encryptedPassword;
+  return update(userId, modifiedUser, model, modelName);
+};
+
 const deleteUser = async (userId) => deleteData(userId, model, modelName);
 
 module.exports = {

@@ -9,10 +9,11 @@ const {
 const { validationErrors } = require("../errors");
 const paymentSchema = require("../checkSchemas/paymentSchema");
 const { duplicateKeyError } = require("../errors");
+const { authorization } = require("../authorization");
 
 const router = express.Router();
 
-router.get("/list", async (req, res, next) => {
+router.get("/list", authorization(true), async (req, res, next) => {
   try {
     const paymentsList = await listPayments();
     res.json(paymentsList);

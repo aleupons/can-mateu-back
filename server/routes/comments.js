@@ -11,6 +11,7 @@ const {
 const { validationErrors } = require("../errors");
 const commentSchema = require("../checkSchemas/commentSchema");
 const { duplicateKeyError } = require("../errors");
+const { authorization } = require("../authorization");
 
 const router = express.Router();
 
@@ -40,6 +41,7 @@ router.get(
 
 router.post(
   "/new-comment",
+  authorization,
   checkSchema(commentSchema),
   validationErrors,
   async (req, res, next) => {
@@ -55,6 +57,7 @@ router.post(
 
 router.put(
   "/comment/:id",
+  authorization,
   check("id", "Id incorrecta").isMongoId(),
   checkSchema(commentSchema),
   validationErrors,
@@ -72,6 +75,7 @@ router.put(
 
 router.delete(
   "/comment/:id",
+  authorization,
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
