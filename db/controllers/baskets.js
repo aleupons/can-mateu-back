@@ -4,6 +4,7 @@ const {
   listDataByName,
   listDataByCategory,
   listDataAndOrderBy,
+  listRecommended,
 } = require("./generalLists");
 
 const model = Basket;
@@ -17,6 +18,8 @@ const listBasketsByCategory = async (category) =>
   listDataByCategory(category, model, modelName);
 const listBasketsAndOrderBy = async (field) =>
   listDataAndOrderBy(field, model, modelName);
+const listRecommendedBaskets = async (userId) =>
+  listRecommended(userId, model, modelName);
 
 const showBasket = async (basketId) => read(basketId, model, modelName);
 const createBasket = async (newBasket) => create(newBasket, model, modelName);
@@ -29,6 +32,7 @@ module.exports = {
   listBasketsByName,
   listBasketsByCategory,
   listBasketsAndOrderBy,
+  listRecommendedBaskets,
   showBasket,
   createBasket,
   modifyBasket,

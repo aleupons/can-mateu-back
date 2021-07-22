@@ -11,6 +11,7 @@ const {
   createProduct,
   modifyProduct,
   deleteProduct,
+  listRecommendedProducts,
 } = require("../../db/controllers/products");
 const { validationErrors } = require("../errors");
 const productSchema = require("../checkSchemas/productSchema");
@@ -62,6 +63,22 @@ router.get("/list-by-field/:field", async (req, res, next) => {
   }
 });
 
+router.get(
+  "/list-recommended/:userId",
+  authorization,
+  check("id", "Id incorrecta").isMongoId(),
+  validationErrors,
+  async (req, res, next) => {
+    const { id } = req.params;
+    try {
+      const productsList = await listRecommendedProducts(id);
+      res.json(productsList);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 /* */
 
 router.get(
@@ -82,8 +99,8 @@ router.get(
 router.post(
   "/new-product",
   authorization(true),
-  checkSchema(productSchema),
-  validationErrors,
+  /* checkSchema(productSchema),
+  validationErrors, */
   upload.single("photoUrl"),
   async (req, res, next) => {
     const product = req.body;

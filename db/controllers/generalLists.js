@@ -63,8 +63,28 @@ const listDataAndOrderBy = async (field, model, modelName) => {
   }
 };
 
+const listRecommended = async (userId, model, modelName) => {
+  try {
+    const list = await model.find().limit(8);
+    if (list.length === 0) {
+      const newError = generateError(
+        `No hi ha cap ${modelName} per recomanar`,
+        404
+      );
+      throw newError;
+    }
+    return list;
+  } catch (error) {
+    const newError = error.statusCode
+      ? error
+      : generateError(`No es poden llistar ${modelName}`, 404);
+    throw newError;
+  }
+};
+
 module.exports = {
   listDataByName,
   listDataByCategory,
   listDataAndOrderBy,
+  listRecommended,
 };
