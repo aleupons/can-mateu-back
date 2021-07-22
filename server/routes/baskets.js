@@ -10,6 +10,7 @@ const {
   createBasket,
   modifyBasket,
   deleteBasket,
+  listRecommendedBaskets,
 } = require("../../db/controllers/baskets");
 const { validationErrors, generateError } = require("../errors");
 const {
@@ -61,6 +62,22 @@ router.get("/list-by-field/:field", async (req, res, next) => {
     next(error);
   }
 });
+
+router.get(
+  "/list-recommended/:userId",
+  authorization,
+  check("id", "Id incorrecta").isMongoId(),
+  validationErrors,
+  async (req, res, next) => {
+    const { id } = req.params;
+    try {
+      const basketsList = await listRecommendedBaskets(id);
+      res.json(basketsList);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 /* */
 
