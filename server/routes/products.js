@@ -98,6 +98,7 @@ router.get(
 
 router.post(
   "/new-product",
+  authorization(true),
   upload.single("photoUrl"),
   checkSchema(productSchema),
   validationErrors,
