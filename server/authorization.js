@@ -2,6 +2,17 @@ const jwt = require("jsonwebtoken");
 const { generateError } = require("./errors");
 require("dotenv").config();
 
+const getToken = () => async (req, res, next) => {
+  if (!req.header("Authorization")) {
+    return next();
+  }
+  const token = req.header("Authorization").split(" ")[1];
+  const userInfo = jwt.verify(token, process.env.SECRET_JWT);
+  const { userId } = userInfo;
+  req.userId = userId;
+  next();
+};
+
 const authorization = (adminTask) => async (req, res, next) => {
   if (!req.header("Authorization")) {
     const newError = generateError("Falta el token d'accés", 403);
@@ -25,4 +36,4 @@ const authorization = (adminTask) => async (req, res, next) => {
   }
 };
 
-module.exports = { authorization };
+module.exports = { getToken, authorization };

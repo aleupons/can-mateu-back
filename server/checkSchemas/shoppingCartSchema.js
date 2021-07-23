@@ -15,9 +15,9 @@ const shoppingCartSchema = {
 };
 
 const shoppingCartProductSchema = {
-  productId: {
-    isMongoId: true,
-    errorMessage: "El producte no és correcte",
+  isBasket: {
+    isBoolean: true,
+    errorMessage: "S'ha d'indicar si s'està afegint un producte o una cistella",
   },
   amount: {
     isNumeric: true,
