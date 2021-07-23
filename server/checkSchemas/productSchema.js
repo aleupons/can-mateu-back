@@ -28,10 +28,6 @@ const productSchema = {
     isNumeric: true,
     errorMessage: "El descompte només pot contenir números (% de descompte)",
   },
-  date: {
-    isDate: true,
-    errorMessage: "La data no és correcta (YYYY-mm-dd)",
-  },
 };
 
 module.exports = productSchema;

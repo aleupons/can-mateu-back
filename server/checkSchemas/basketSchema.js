@@ -1,7 +1,4 @@
 const basketSchema = {
-  photoUrl: {
-    errorMessage: "La url de la foto només pot contenir lletres",
-  },
   name: {
     matches: /^[a-zA-Z ]*$/,
     errorMessage: "El nom només pot contenir lletres",
@@ -11,6 +8,7 @@ const basketSchema = {
     errorMessage: "La descripció només pot contenir lletres",
   },
   basketProducts: {
+    optional: true,
     isArray: true,
     errorMessage: "Els productes no són correctes",
   },
@@ -38,10 +36,6 @@ const basketSchema = {
     optional: true,
     isNumeric: true,
     errorMessage: "El descompte només pot contenir números (% de descompte)",
-  },
-  date: {
-    isDate: true,
-    errorMessage: "La data no és correcta (YYYY-mm-dd)",
   },
 };
 
