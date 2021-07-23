@@ -130,14 +130,13 @@ router.put(
 );
 
 router.delete(
-  "/user/:id",
+  "/user",
   authorization(false),
-  check("id", "Id incorrecta").isMongoId(),
-  validationErrors,
+  getToken(),
   async (req, res, next) => {
-    const { id } = req.params;
+    const { userId } = req;
     try {
-      const user = await deleteUser(id);
+      const user = await deleteUser(userId);
       res.json(user);
     } catch (error) {
       next(error);
