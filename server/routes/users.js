@@ -2,6 +2,7 @@ const { check, checkSchema } = require("express-validator");
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const debug = require("debug")("can-mateu:server:routes:users");
+const { LocalStorage } = require("node-localstorage");
 require("dotenv").config();
 const {
   loginUser,
@@ -16,6 +17,12 @@ const { validationErrors } = require("../errors");
 const userSchema = require("../checkSchemas/userSchema");
 const { duplicateKeyError } = require("../errors");
 const { authorization } = require("../authorization");
+const {
+  listShoppingCarts,
+  modifyShoppingCart,
+} = require("../../db/controllers/shoppingCarts");
+
+const localStorage = new LocalStorage("./scratch");
 
 const router = express.Router();
 
@@ -72,8 +79,18 @@ router.post(
   validationErrors,
   async (req, res, next) => {
     const user = req.body;
+    const shoppingCartId = localStorage.getItem("shoppingCartId");
     try {
       const newUser = await createUser(user);
+      if (shoppingCartId) {
+        const shoppingCarts = await listShoppingCarts();
+        const shoppingCart = await shoppingCarts.find(({ _id }) =>
+          _id.equals(shoppingCartId)
+        );
+        shoppingCart.userId = newUser._id;
+        await modifyShoppingCart(shoppingCartId, shoppingCart);
+        localStorage.removeItem("shoppingCartId");
+      }
       res.status(201).json(newUser);
     } catch (error) {
       duplicateKeyError(req, res, next, error);
