@@ -16,7 +16,7 @@ const {
 const { validationErrors } = require("../errors");
 const userSchema = require("../checkSchemas/userSchema");
 const { duplicateKeyError } = require("../errors");
-const { authorization } = require("../authorization");
+const { authorization, getToken } = require("../authorization");
 const {
   listShoppingCarts,
   modifyShoppingCart,
@@ -59,13 +59,28 @@ router.get("/list", authorization(true), async (req, res, next) => {
 
 router.get(
   "/user/:id",
-  authorization(false),
+  authorization(true),
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
     const { id } = req.params;
     try {
       const user = await showUser(id);
+      res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.get(
+  "/my-user",
+  authorization(false),
+  getToken(),
+  async (req, res, next) => {
+    const { userId } = req;
+    try {
+      const user = await showUser(userId);
       res.json(user);
     } catch (error) {
       next(error);
