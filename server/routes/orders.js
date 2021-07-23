@@ -10,13 +10,29 @@ const {
 const { validationErrors } = require("../errors");
 const orderSchema = require("../checkSchemas/orderSchema");
 const { duplicateKeyError } = require("../errors");
+const { listShoppingCarts } = require("../../db/controllers/shoppingCarts");
+const { authorization } = require("../authorization");
 
 const router = express.Router();
 
-router.get("/list", async (req, res, next) => {
+router.get("/list", authorization(true), async (req, res, next) => {
   try {
     const ordersList = await listOrders();
     res.json(ordersList);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/my-orders", async (req, res, next) => {
+  const { userId: id } = req;
+  try {
+    const ordersList = await listOrders();
+    const myOrders = await ordersList.filter(({ userId }) =>
+      userId._id.equals(id)
+    );
+    console.log(myOrders);
+    res.json(myOrders);
   } catch (error) {
     next(error);
   }
@@ -37,20 +53,25 @@ router.get(
   }
 );
 
-router.post(
-  "/new-order",
-  checkSchema(orderSchema),
-  validationErrors,
-  async (req, res, next) => {
-    const order = req.body;
-    try {
-      const newOrder = await createOrder(order);
-      res.status(201).json(newOrder);
-    } catch (error) {
-      duplicateKeyError(req, res, next, error);
-    }
+router.post("/new-order", validationErrors, async (req, res, next) => {
+  const { userId: id } = req;
+  try {
+    const shoppingCarts = await listShoppingCarts();
+    const shoppingCart = await shoppingCarts.find(({ userId }) =>
+      userId._id.equals(id)
+    );
+    const date = new Date();
+    const modifiedOrder = {
+      shoppingCartId: shoppingCart._id,
+      userId: id,
+      date,
+    };
+    const newOrder = await createOrder(modifiedOrder);
+    res.status(201).json(newOrder);
+  } catch (error) {
+    duplicateKeyError(req, res, next, error);
   }
-);
+});
 
 router.delete(
   "/order/:id",
