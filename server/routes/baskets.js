@@ -1,6 +1,7 @@
 const { check, checkSchema } = require("express-validator");
 const express = require("express");
 const debug = require("debug")("can-mateu:server:routes:baskets");
+const multer = require("multer");
 const {
   listBaskets,
   listBasketsByName,
@@ -19,8 +20,10 @@ const {
 } = require("../checkSchemas/basketSchema");
 const { duplicateKeyError } = require("../errors");
 const { authorization } = require("../authorization");
+const fireBase = require("../fireBase");
 
 const router = express.Router();
+const upload = multer();
 
 router.get("/list", async (req, res, next) => {
   try {
@@ -99,15 +102,17 @@ router.get(
 router.post(
   "/new-basket",
   authorization(true),
+  upload.single("photoUrl"),
   checkSchema(basketSchema),
   validationErrors,
   async (req, res, next) => {
     const basket = req.body;
     try {
-      const newBasket = await createBasket(basket);
-      res.status(201).json(newBasket);
+      const date = new Date();
+      const modifiedBasket = { ...basket, date };
+      fireBase(req, res, next, createBasket, modifiedBasket);
     } catch (error) {
-      duplicateKeyError(req, res, next, error);
+      next(error);
     }
   }
 );
@@ -116,16 +121,18 @@ router.put(
   "/basket/:id",
   authorization(true),
   check("id", "Id incorrecta").isMongoId(),
+  upload.single("photoUrl"),
   checkSchema(basketSchema),
   validationErrors,
   async (req, res, next) => {
     const { id } = req.params;
     const basket = req.body;
     try {
-      const modifiedBasket = await modifyBasket(id, basket);
-      res.json(modifiedBasket);
+      const date = new Date();
+      const modifiedBasket = { ...basket, date };
+      fireBase(req, res, next, modifyBasket, modifiedBasket, id);
     } catch (error) {
-      duplicateKeyError(req, res, next, error);
+      next(error);
     }
   }
 );

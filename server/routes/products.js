@@ -105,7 +105,9 @@ router.post(
   async (req, res, next) => {
     const product = req.body;
     try {
-      fireBase(req, res, next, createProduct, product);
+      const date = new Date();
+      const modifiedProduct = { ...product, date };
+      fireBase(req, res, next, createProduct, modifiedProduct);
     } catch (error) {
       next(error);
     }
@@ -116,16 +118,18 @@ router.put(
   "/product/:id",
   authorization(true),
   check("id", "Id incorrecta").isMongoId(),
+  upload.single("photoUrl"),
   checkSchema(productSchema),
   validationErrors,
   async (req, res, next) => {
     const { id } = req.params;
     const product = req.body;
     try {
-      const modifiedProduct = await modifyProduct(id, product);
-      res.json(modifiedProduct);
+      const date = new Date();
+      const modifiedProduct = { ...product, date };
+      fireBase(req, res, next, modifyProduct, modifiedProduct, id);
     } catch (error) {
-      duplicateKeyError(req, res, next, error);
+      next(error);
     }
   }
 );
