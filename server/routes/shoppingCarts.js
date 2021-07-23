@@ -1,6 +1,7 @@
 const { check, checkSchema } = require("express-validator");
 const express = require("express");
 const debug = require("debug")("can-mateu:server:routes:shopping-carts");
+const { LocalStorage } = require("node-localstorage");
 const {
   listShoppingCarts,
   showShoppingCart,
@@ -18,9 +19,11 @@ const {
 const { generateError, duplicateKeyError } = require("../errors");
 const { getToken, authorization } = require("../authorization");
 
+const localStorage = new LocalStorage("./scratch");
+
 const router = express.Router();
 
-router.get("/list", authorization(false), async (req, res, next) => {
+router.get("/list", authorization(true), async (req, res, next) => {
   try {
     const shoppingCartsList = await listShoppingCarts();
     res.json(shoppingCartsList);
@@ -29,29 +32,39 @@ router.get("/list", authorization(false), async (req, res, next) => {
   }
 });
 
-router.get(
-  "/shopping-cart/:id",
-  check("id", "Id incorrecta").isMongoId(),
-  validationErrors,
-  async (req, res, next) => {
-    const { id } = req.params;
-    try {
-      const shoppingCart = await showShoppingCart(id);
-      res.json(shoppingCart);
-    } catch (error) {
-      next(error);
+router.get("/shopping-cart", getToken(), async (req, res, next) => {
+  const { userId: id } = req;
+  try {
+    if (!id) {
+      const shoppingCartId = localStorage.getItem("shoppingCartId");
+      const shoppingCart = await showShoppingCart(shoppingCartId);
+      return res.json(shoppingCart);
     }
+    const shoppingCarts = await listShoppingCarts();
+    const shoppingCart = await shoppingCarts.find(({ userId }) =>
+      userId._id.equals(id)
+    );
+    res.json(shoppingCart);
+  } catch (error) {
+    next(error);
   }
-);
+});
 
 router.post(
   "/new-shopping-cart",
   checkSchema(shoppingCartSchema),
   validationErrors,
+  getToken(),
   async (req, res, next) => {
-    const shoppingCart = req.body;
+    const { userId } = req;
     try {
-      const newShoppingCart = await createShoppingCart(shoppingCart);
+      const newShoppingCart = await createShoppingCart({
+        userId: userId || undefined,
+      });
+      if (!userId) {
+        localStorage.removeItem("shoppingCartId");
+        localStorage.setItem("shoppingCartId", newShoppingCart._id);
+      }
       res.status(201).json(newShoppingCart);
     } catch (error) {
       duplicateKeyError(req, res, next, error);
@@ -71,11 +84,17 @@ router.put(
     const { userId } = req;
     const { productId } = req.params;
     const { amount, isBasket } = req.body;
+    let shoppingCart = {};
     try {
-      const shoppingCarts = await listShoppingCarts();
-      const shoppingCart = await shoppingCarts.find((existShoppingCart) =>
-        existShoppingCart.userId._id.equals(userId)
-      );
+      if (userId) {
+        const shoppingCarts = await listShoppingCarts();
+        shoppingCart = await shoppingCarts.find((existShoppingCart) =>
+          existShoppingCart.userId._id.equals(userId)
+        );
+      } else {
+        const shoppingCartId = localStorage.getItem("shoppingCartId");
+        shoppingCart = await showShoppingCart(shoppingCartId);
+      }
       if (shoppingCart) {
         let basket = {};
         let product = {};
@@ -129,13 +148,18 @@ router.put(
   async (req, res, next) => {
     const { userId } = req;
     const { productId } = req.params;
+    let shoppingCart = {};
     try {
-      const shoppingCarts = await listShoppingCarts();
-      const shoppingCart = await shoppingCarts.find((existShoppingCart) =>
-        existShoppingCart.userId._id.equals(userId)
-      );
+      if (userId) {
+        const shoppingCarts = await listShoppingCarts();
+        shoppingCart = await shoppingCarts.find((existShoppingCart) =>
+          existShoppingCart.userId._id.equals(userId)
+        );
+      } else {
+        const shoppingCartId = localStorage.getItem("shoppingCartId");
+        shoppingCart = await showShoppingCart(shoppingCartId);
+      }
       if (shoppingCart) {
-        const product = await showProduct(productId);
         if (
           shoppingCart.products.find((existsProduct) =>
             existsProduct.productId._id.equals(productId)
@@ -163,14 +187,49 @@ router.put(
 
 /* */
 
+router.put("/empty-shopping-cart", getToken(), async (req, res, next) => {
+  const { userId } = req;
+  try {
+    if (userId) {
+      const shoppingCarts = await listShoppingCarts();
+      const shoppingCart = await shoppingCarts.find((existShoppingCart) =>
+        existShoppingCart.userId._id.equals(userId)
+      );
+      const emptyShoppingCart = await modifyShoppingCart(shoppingCart._id, {
+        products: [],
+        price: 0,
+        userId,
+      });
+      res.status(201).json(emptyShoppingCart);
+    } else {
+      const shoppingCart = await showShoppingCart(
+        localStorage.getItem("shoppingCartId")
+      );
+      const emptyShoppingCart = await modifyShoppingCart(shoppingCart._id, {
+        products: [],
+        price: 0,
+        userId: undefined,
+      });
+      res.status(201).json(emptyShoppingCart);
+    }
+  } catch (error) {
+    duplicateKeyError(req, res, next, error);
+  }
+});
+
 router.delete(
-  "/shopping-cart/:id",
+  "/shopping-cart/:userId",
+  authorization(true),
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
-    const { id } = req.params;
+    const { userId: id } = req.params;
     try {
-      const shoppingCart = await deleteShoppingCart(id);
+      const shoppingCarts = await listShoppingCarts();
+      const shoppingCartId = await shoppingCarts.find(({ userId }) =>
+        userId.equals(id)
+      );
+      const shoppingCart = await deleteShoppingCart(shoppingCartId);
       res.json(shoppingCart);
     } catch (error) {
       next(error);
