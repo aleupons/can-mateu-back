@@ -114,16 +114,14 @@ router.post(
 );
 
 router.put(
-  "/user/:id",
+  "/user",
   authorization(false),
-  check("id", "Id incorrecta").isMongoId(),
-  checkSchema(userSchema),
-  validationErrors,
+  getToken(),
   async (req, res, next) => {
-    const { id } = req.params;
+    const { userId } = req;
     const user = req.body;
     try {
-      const modifiedUser = await modifyUser(id, user);
+      const modifiedUser = await modifyUser(userId, user);
       res.json(modifiedUser);
     } catch (error) {
       duplicateKeyError(req, res, next, error);
