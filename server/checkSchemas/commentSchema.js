@@ -3,10 +3,6 @@ const commentSchema = {
     isMongoId: true,
     errorMessage: "El producte no és correcte",
   },
-  userId: {
-    isMongoId: true,
-    errorMessage: "L'usuari no és correcte",
-  },
   comment: {
     isLength: {
       options: {

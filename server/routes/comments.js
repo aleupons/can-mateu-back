@@ -8,7 +8,7 @@ const {
   modifyComment,
   deleteComment,
 } = require("../../db/controllers/comments");
-const { validationErrors } = require("../errors");
+const { validationErrors, generateError } = require("../errors");
 const commentSchema = require("../checkSchemas/commentSchema");
 const { duplicateKeyError } = require("../errors");
 const { authorization } = require("../authorization");
@@ -45,7 +45,9 @@ router.post(
   checkSchema(commentSchema),
   validationErrors,
   async (req, res, next) => {
+    const { userId } = req;
     const comment = req.body;
+    comment.userId = userId;
     try {
       const newComment = await createComment(comment);
       res.status(201).json(newComment);
@@ -62,9 +64,14 @@ router.put(
   checkSchema(commentSchema),
   validationErrors,
   async (req, res, next) => {
+    const { userId } = req;
     const { id } = req.params;
     const comment = req.body;
     try {
+      const foundComment = await showComment(id);
+      if (!foundComment.userId._id.equals(userId)) {
+        throw generateError("Accés denegat", 401);
+      }
       const modifiedComment = await modifyComment(id, comment);
       res.json(modifiedComment);
     } catch (error) {
@@ -79,8 +86,13 @@ router.delete(
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
+    const { userId } = req;
     const { id } = req.params;
     try {
+      const foundComment = await showComment(id);
+      if (!foundComment.userId._id.equals(userId)) {
+        throw generateError("Accés denegat", 401);
+      }
       const comment = await deleteComment(id);
       res.json(comment);
     } catch (error) {

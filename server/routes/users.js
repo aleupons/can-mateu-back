@@ -73,20 +73,15 @@ router.get(
   }
 );
 
-router.get(
-  "/my-user",
-  authorization(false),
-  getToken(),
-  async (req, res, next) => {
-    const { userId } = req;
-    try {
-      const user = await showUser(userId);
-      res.json(user);
-    } catch (error) {
-      next(error);
-    }
+router.get("/my-user", authorization(false), async (req, res, next) => {
+  const { userId } = req;
+  try {
+    const user = await showUser(userId);
+    res.json(user);
+  } catch (error) {
+    next(error);
   }
-);
+});
 
 router.post(
   "/new-user",
@@ -113,35 +108,25 @@ router.post(
   }
 );
 
-router.put(
-  "/user",
-  authorization(false),
-  getToken(),
-  async (req, res, next) => {
-    const { userId } = req;
-    const user = req.body;
-    try {
-      const modifiedUser = await modifyUser(userId, user);
-      res.json(modifiedUser);
-    } catch (error) {
-      duplicateKeyError(req, res, next, error);
-    }
+router.put("/user", authorization(false), async (req, res, next) => {
+  const { userId } = req;
+  const user = req.body;
+  try {
+    const modifiedUser = await modifyUser(userId, user);
+    res.json(modifiedUser);
+  } catch (error) {
+    duplicateKeyError(req, res, next, error);
   }
-);
+});
 
-router.delete(
-  "/user",
-  authorization(false),
-  getToken(),
-  async (req, res, next) => {
-    const { userId } = req;
-    try {
-      const user = await deleteUser(userId);
-      res.json(user);
-    } catch (error) {
-      next(error);
-    }
+router.delete("/user", authorization(false), async (req, res, next) => {
+  const { userId } = req;
+  try {
+    const user = await deleteUser(userId);
+    res.json(user);
+  } catch (error) {
+    next(error);
   }
-);
+});
 
 module.exports = router;

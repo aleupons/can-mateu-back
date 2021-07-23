@@ -7,7 +7,7 @@ const {
   createOrder,
   deleteOrder,
 } = require("../../db/controllers/orders");
-const { validationErrors } = require("../errors");
+const { validationErrors, generateError } = require("../errors");
 const orderSchema = require("../checkSchemas/orderSchema");
 const { duplicateKeyError } = require("../errors");
 const { listShoppingCarts } = require("../../db/controllers/shoppingCarts");
@@ -43,9 +43,13 @@ router.get(
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
+    const { userId } = req;
     const { id } = req.params;
     try {
       const order = await showOrder(id);
+      if (!order.userId.equals(userId)) {
+        throw generateError("Accés denegat", 401);
+      }
       res.json(order);
     } catch (error) {
       next(error);
@@ -78,10 +82,15 @@ router.delete(
   check("id", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
+    const { userId } = req;
     const { id } = req.params;
     try {
-      const order = await deleteOrder(id);
-      res.json(order);
+      const order = await showOrder(id);
+      if (!order.userId.equals(userId)) {
+        throw generateError("Accés denegat", 401);
+      }
+      const deletedOrder = await deleteOrder(id);
+      res.json(deletedOrder);
     } catch (error) {
       next(error);
     }
