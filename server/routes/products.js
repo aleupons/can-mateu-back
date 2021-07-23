@@ -98,10 +98,9 @@ router.get(
 
 router.post(
   "/new-product",
-  authorization(true),
-  /* checkSchema(productSchema),
-  validationErrors, */
   upload.single("photoUrl"),
+  checkSchema(productSchema),
+  validationErrors,
   async (req, res, next) => {
     const product = req.body;
     try {
