@@ -68,7 +68,6 @@ router.post(
       }
       res.status(201).json(newShoppingCart);
     } catch (error) {
-      console.log(error.message);
       duplicateKeyError(req, res, next, error);
     }
   }
@@ -107,45 +106,53 @@ router.put(
         } else if (isBasket) {
           basket = await showBasket(productId);
         }
-        if (product || basket) {
+        if (
+          JSON.stringify(product) !== "{}" ||
+          JSON.stringify(basket) !== "{}"
+        ) {
           // Si existeix el producte que ens passen
           let productToModify = {};
-          if (product) {
-            productToModify = shoppingCart.products.find((existsProduct) => {
-              if (existsProduct.productId) {
-                return existsProduct.productId._id.equals(productId);
-              }
-              return false;
-            });
-          } else if (basket) {
-            productToModify = shoppingCart.products.find((existsProduct) => {
-              if (existsProduct.productId) {
-                return existsProduct.basketId._id.equals(productId);
-              }
-              return false;
-            });
+          if (JSON.stringify(product) !== "{}") {
+            productToModify = shoppingCart.products.find((existsProduct) =>
+              existsProduct.productId
+                ? existsProduct.productId._id.equals(productId)
+                : false
+            );
+          } else if (JSON.stringify(basket) !== "{}") {
+            productToModify = shoppingCart.products.find((existsProduct) =>
+              existsProduct.basketId
+                ? existsProduct.basketId._id.equals(productId)
+                : false
+            );
           }
           if (productToModify) {
             // Si el carro ja té el producte
             const products = shoppingCart.products.map((productToQuantify) => {
-              if (productToQuantify.productId._id.equals(productId)) {
-                productToQuantify.amount = amount;
-                productToQuantify.price =
-                  (product ? product.priceUnit : basket.priceUnit) * amount;
+              if (productToQuantify.productId) {
+                if (productToQuantify.productId._id.equals(productId)) {
+                  productToQuantify.amount = amount;
+                  productToQuantify.price = product.priceUnit * amount;
+                }
+              } else if (productToQuantify.basketId) {
+                if (productToQuantify.basketId._id.equals(productId)) {
+                  productToQuantify.amount = amount;
+                  productToQuantify.price = basket.priceUnit * amount;
+                }
               }
               return productToQuantify;
             });
             shoppingCart.products = products;
-            // shoppingCart.price PREU TOTAL (per BBDD, per back o per front?)
           } else {
             // Si el carro no té el producte
             shoppingCart.products.push({
               productId: !isBasket ? productId : undefined,
               basketId: isBasket ? productId : undefined,
               amount,
-              price: (product ? product.priceUnit : basket.priceUnit) * amount,
+              price:
+                (JSON.stringify(product) !== "{}"
+                  ? product.priceUnit
+                  : basket.priceUnit) * amount,
             });
-            // shoppingCart.price PREU TOTAL (per BBDD, per back o per front?)
           }
         } else {
           throw generateError("Aquest producte o cistella no existeix", 400);
@@ -163,7 +170,6 @@ router.put(
       );
       res.json(modifiedShoppingCart);
     } catch (error) {
-      console.log(error);
       duplicateKeyError(req, res, next, error);
     }
   }
@@ -195,37 +201,31 @@ router.put(
       if (shoppingCart) {
         if (!isBasket) {
           if (
-            shoppingCart.products.find((existsProduct) => {
-              if (existsProduct.productId) {
-                return existsProduct.productId._id.equals(productId);
-              }
-              return false;
-            })
+            shoppingCart.products.find((existsProduct) =>
+              existsProduct.productId
+                ? existsProduct.productId._id.equals(productId)
+                : false
+            )
           ) {
-            shoppingCart.products = shoppingCart.products.filter((product) => {
-              if (product.productId) {
-                return !product.productId._id.equals(productId);
-              }
-              return true;
-            });
+            shoppingCart.products = shoppingCart.products.filter((product) =>
+              product.productId
+                ? !product.productId._id.equals(productId)
+                : true
+            );
           } else {
             throw generateError("Aquest producte no està al carro", 400);
           }
         } else if (isBasket) {
           if (
-            shoppingCart.products.find((existsProduct) => {
-              if (existsProduct.basketId) {
-                return existsProduct.basketId._id.equals(productId);
-              }
-              return false;
-            })
+            shoppingCart.products.find((existsProduct) =>
+              existsProduct.basketId
+                ? existsProduct.basketId._id.equals(productId)
+                : false
+            )
           ) {
-            shoppingCart.products = shoppingCart.products.filter((product) => {
-              if (product.basketId) {
-                return !product.basketId._id.equals(productId);
-              }
-              return true;
-            });
+            shoppingCart.products = shoppingCart.products.filter((product) =>
+              product.basketId ? !product.basketId._id.equals(productId) : true
+            );
           } else {
             throw generateError("Aquesta cistella no està al carro", 400);
           }
@@ -243,7 +243,6 @@ router.put(
       );
       res.json(modifiedShoppingCart);
     } catch (error) {
-      console.log(error);
       duplicateKeyError(req, res, next, error);
     }
   }
