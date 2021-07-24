@@ -149,7 +149,6 @@ router.put(
     const basketProduct = req.body;
     try {
       const basket = await showBasket(id);
-      console.log(basketProduct._id === false);
       if (basketProduct._id !== undefined) {
         // Si la cistella ja té el producte
         const products = basket.basketProducts.map((productToModify) => {

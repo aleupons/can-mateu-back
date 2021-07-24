@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
 const User = require("./User");
 const Product = require("./Product");
+const { showProduct } = require("../controllers/products");
 
 const ShoppingCartSchema = new Schema(
   {
@@ -15,15 +16,30 @@ const ShoppingCartSchema = new Schema(
         {
           productId: {
             type: Schema.Types.ObjectId,
-            ref: "Product",
+            refPath: "Product",
+            required: true,
+          },
+          basketId: {
+            type: Schema.Types.ObjectId,
+            refPath: "Basket",
             required: true,
           },
           amount: {
             type: Number,
             required: true,
           },
+          price: {
+            type: Number,
+            default: 0,
+            required: true,
+          },
+          isBasket: {
+            type: Boolean,
+            required: true,
+          },
         },
       ],
+      default: [],
     },
     price: {
       type: Number,

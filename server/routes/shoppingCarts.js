@@ -15,6 +15,7 @@ const { validationErrors } = require("../errors");
 const {
   shoppingCartSchema,
   shoppingCartProductSchema,
+  shoppingCartProductRemoveSchema,
 } = require("../checkSchemas/shoppingCartSchema");
 const { generateError, duplicateKeyError } = require("../errors");
 const { getToken, authorization } = require("../authorization");
@@ -67,6 +68,7 @@ router.post(
       }
       res.status(201).json(newShoppingCart);
     } catch (error) {
+      console.log(error.message);
       duplicateKeyError(req, res, next, error);
     }
   }
@@ -89,7 +91,9 @@ router.put(
       if (userId) {
         const shoppingCarts = await listShoppingCarts();
         shoppingCart = await shoppingCarts.find((existShoppingCart) =>
-          existShoppingCart.userId._id.equals(userId)
+          existShoppingCart.userId
+            ? existShoppingCart.userId._id.equals(userId)
+            : false
         );
       } else {
         const shoppingCartId = localStorage.getItem("shoppingCartId");
@@ -105,14 +109,29 @@ router.put(
         }
         if (product || basket) {
           // Si existeix el producte que ens passen
-          const productToModify = shoppingCart.products.find((existsProduct) =>
-            existsProduct.productId._id.equals(productId)
-          );
+          let productToModify = {};
+          if (product) {
+            productToModify = shoppingCart.products.find((existsProduct) => {
+              if (existsProduct.productId) {
+                return existsProduct.productId._id.equals(productId);
+              }
+              return false;
+            });
+          } else if (basket) {
+            productToModify = shoppingCart.products.find((existsProduct) => {
+              if (existsProduct.productId) {
+                return existsProduct.basketId._id.equals(productId);
+              }
+              return false;
+            });
+          }
           if (productToModify) {
             // Si el carro ja té el producte
             const products = shoppingCart.products.map((productToQuantify) => {
               if (productToQuantify.productId._id.equals(productId)) {
                 productToQuantify.amount = amount;
+                productToQuantify.price =
+                  (product ? product.priceUnit : basket.priceUnit) * amount;
               }
               return productToQuantify;
             });
@@ -120,7 +139,12 @@ router.put(
             // shoppingCart.price PREU TOTAL (per BBDD, per back o per front?)
           } else {
             // Si el carro no té el producte
-            shoppingCart.products.push({ productId, amount });
+            shoppingCart.products.push({
+              productId: !isBasket ? productId : undefined,
+              basketId: isBasket ? productId : undefined,
+              amount,
+              price: (product ? product.priceUnit : basket.priceUnit) * amount,
+            });
             // shoppingCart.price PREU TOTAL (per BBDD, per back o per front?)
           }
         } else {
@@ -129,12 +153,17 @@ router.put(
       } else {
         throw generateError("Aquest usuari no té cap carro", 400);
       }
+      shoppingCart.price = shoppingCart.products.reduce((counter, product) => {
+        counter += product.price;
+        return counter;
+      }, 0);
       const modifiedShoppingCart = await modifyShoppingCart(
         shoppingCart._id,
         shoppingCart
       );
       res.json(modifiedShoppingCart);
     } catch (error) {
+      console.log(error);
       duplicateKeyError(req, res, next, error);
     }
   }
@@ -143,43 +172,78 @@ router.put(
 router.put(
   "/shopping-cart/remove/:productId",
   check("productId", "Id incorrecta").isMongoId(),
+  checkSchema(shoppingCartProductRemoveSchema),
   validationErrors,
   getToken(),
   async (req, res, next) => {
     const { userId } = req;
     const { productId } = req.params;
+    const { isBasket } = req.body;
     let shoppingCart = {};
     try {
       if (userId) {
         const shoppingCarts = await listShoppingCarts();
         shoppingCart = await shoppingCarts.find((existShoppingCart) =>
-          existShoppingCart.userId._id.equals(userId)
+          existShoppingCart.userId
+            ? existShoppingCart.userId._id.equals(userId)
+            : false
         );
       } else {
         const shoppingCartId = localStorage.getItem("shoppingCartId");
         shoppingCart = await showShoppingCart(shoppingCartId);
       }
       if (shoppingCart) {
-        if (
-          shoppingCart.products.find((existsProduct) =>
-            existsProduct.productId._id.equals(productId)
-          )
-        ) {
-          shoppingCart.products = shoppingCart.products.filter(
-            (product) => !product.productId._id.equals(productId)
-          );
-        } else {
-          throw generateError("Aquest producte no està al carro", 400);
+        if (!isBasket) {
+          if (
+            shoppingCart.products.find((existsProduct) => {
+              if (existsProduct.productId) {
+                return existsProduct.productId._id.equals(productId);
+              }
+              return false;
+            })
+          ) {
+            shoppingCart.products = shoppingCart.products.filter((product) => {
+              if (product.productId) {
+                return !product.productId._id.equals(productId);
+              }
+              return true;
+            });
+          } else {
+            throw generateError("Aquest producte no està al carro", 400);
+          }
+        } else if (isBasket) {
+          if (
+            shoppingCart.products.find((existsProduct) => {
+              if (existsProduct.basketId) {
+                return existsProduct.basketId._id.equals(productId);
+              }
+              return false;
+            })
+          ) {
+            shoppingCart.products = shoppingCart.products.filter((product) => {
+              if (product.basketId) {
+                return !product.basketId._id.equals(productId);
+              }
+              return true;
+            });
+          } else {
+            throw generateError("Aquesta cistella no està al carro", 400);
+          }
         }
       } else {
         throw generateError("Aquest usuari no té cap carro", 400);
       }
+      shoppingCart.price = shoppingCart.products.reduce((counter, product) => {
+        counter += product.price;
+        return counter;
+      }, 0);
       const modifiedShoppingCart = await modifyShoppingCart(
         shoppingCart._id,
         shoppingCart
       );
       res.json(modifiedShoppingCart);
     } catch (error) {
+      console.log(error);
       duplicateKeyError(req, res, next, error);
     }
   }
