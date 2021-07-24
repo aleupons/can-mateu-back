@@ -13,6 +13,10 @@ const {
   modifyUser,
   deleteUser,
 } = require("../../db/controllers/users");
+const {
+  listComments,
+  deleteComment,
+} = require("../../db/controllers/comments");
 const { validationErrors } = require("../errors");
 const userSchema = require("../checkSchemas/userSchema");
 const { duplicateKeyError } = require("../errors");
@@ -20,6 +24,7 @@ const { authorization, getToken } = require("../authorization");
 const {
   listShoppingCarts,
   modifyShoppingCart,
+  deleteShoppingCart,
 } = require("../../db/controllers/shoppingCarts");
 
 const localStorage = new LocalStorage("./scratch");
@@ -123,6 +128,19 @@ router.delete("/user", authorization(false), async (req, res, next) => {
   const { userId } = req;
   try {
     const user = await deleteUser(userId);
+    const comments = await listComments();
+    const userComments = comments.filter((comment) =>
+      comment.userId._id.equals(userId)
+    );
+    userComments.map(async (userComment) => {
+      const deletedComment = await deleteComment(userComment._id);
+      return deletedComment;
+    });
+    const shoppingCarts = await listShoppingCarts();
+    const userShoppingCart = shoppingCarts.find((shoppingCart) =>
+      shoppingCart.userId._id.equals(userId)
+    );
+    const deletedShoppingCart = await deleteShoppingCart(userShoppingCart._id);
     res.json(user);
   } catch (error) {
     next(error);
