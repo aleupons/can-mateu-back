@@ -108,6 +108,10 @@ router.post(
     const basket = req.body;
     try {
       const date = new Date();
+      if (basket.discount !== 0) {
+        basket.newPrice =
+          basket.priceUnit - (basket.discount / 100) * basket.priceUnit;
+      }
       const modifiedBasket = { ...basket, date };
       fireBase(req, res, next, createBasket, modifiedBasket);
     } catch (error) {
@@ -128,6 +132,10 @@ router.put(
     const basket = req.body;
     try {
       const date = new Date();
+      if (basket.discount !== 0) {
+        basket.newPrice =
+          basket.priceUnit - (basket.discount / 100) * basket.priceUnit;
+      }
       const modifiedBasket = { ...basket, date };
       fireBase(req, res, next, modifyBasket, modifiedBasket, id);
     } catch (error) {

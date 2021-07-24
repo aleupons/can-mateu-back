@@ -13,7 +13,7 @@ const {
   deleteProduct,
   listRecommendedProducts,
 } = require("../../db/controllers/products");
-const { validationErrors } = require("../errors");
+const { validationErrors, generateError } = require("../errors");
 const productSchema = require("../checkSchemas/productSchema");
 const { duplicateKeyError } = require("../errors");
 const { authorization } = require("../authorization");
@@ -105,6 +105,10 @@ router.post(
     const product = req.body;
     try {
       const date = new Date();
+      if (product.discount !== 0) {
+        product.newPrice =
+          product.priceUnit - (product.discount / 100) * product.priceUnit;
+      }
       const modifiedProduct = { ...product, date };
       fireBase(req, res, next, createProduct, modifiedProduct);
     } catch (error) {
@@ -125,6 +129,10 @@ router.put(
     const product = req.body;
     try {
       const date = new Date();
+      if (product.discount !== 0) {
+        product.newPrice =
+          product.priceUnit - (product.discount / 100) * product.priceUnit;
+      }
       const modifiedProduct = { ...product, date };
       fireBase(req, res, next, modifyProduct, modifiedProduct, id);
     } catch (error) {
