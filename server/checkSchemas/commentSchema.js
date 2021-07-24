@@ -12,6 +12,7 @@ const commentSchema = {
     errorMessage: "El comentari ha de tenir màxim 150 paraules",
   },
   rating: {
+    optional: true,
     isFloat: {
       options: {
         min: 0,
@@ -19,10 +20,6 @@ const commentSchema = {
       },
     },
     errorMessage: "La valoració ha de ser un número entre 0 i 5",
-  },
-  date: {
-    isDate: true,
-    errorMessage: "La data no és correcta (YYYY-mm-dd)",
   },
 };
 

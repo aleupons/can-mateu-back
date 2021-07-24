@@ -1,7 +1,11 @@
 const userSchema = {
   username: {
-    matches: /^[a-zA-Z0-9]+$/,
-    errorMessage: "El nom d'usuari ha de ser alfanumèric",
+    notEmpty: true,
+    matches: {
+      options: [/^[a-zA-Z0-9._]+$/],
+    },
+    errorMessage:
+      "El nom d'usuari només pot contenir, lletres sense accents, números i els caràcters '.' i '_'",
   },
   password: {
     isLength: {
@@ -12,12 +16,18 @@ const userSchema = {
     },
   },
   name: {
-    matches: /^[a-zA-Z ]*$/,
-    errorMessage: "El nom només pot contenir caràcters",
+    notEmpty: true,
+    matches: {
+      options: [/^[A-Za-zÀ-ÖØ-öø-ÿ ]*$/],
+    },
+    errorMessage: "El nom només pot contenir lletres",
   },
   surnames: {
-    matches: /^[a-zA-Z ]*$/,
-    errorMessage: "Els cognoms només poden contenir caràcters",
+    notEmpty: true,
+    matches: {
+      options: [/^[A-Za-zÀ-ÖØ-öø-ÿ ]*$/],
+    },
+    errorMessage: "Els cognoms només poden contenir lletres",
   },
   phone: {
     optional: true,
@@ -37,7 +47,9 @@ const userSchema = {
   },
   address: {
     optional: true,
-    matches: /^[a-zA-Z ]*$/,
+    matches: {
+      options: [/^[A-Za-zÀ-ÖØ-öø-ÿ0-9./ ]*$/],
+    },
     errorMessage: "Adreça incorrecta",
   },
   isAdmin: {

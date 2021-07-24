@@ -48,6 +48,8 @@ router.post(
     const { userId } = req;
     const comment = req.body;
     comment.userId = userId;
+    const date = new Date();
+    comment.date = date;
     try {
       const newComment = await createComment(comment);
       res.status(201).json(newComment);
