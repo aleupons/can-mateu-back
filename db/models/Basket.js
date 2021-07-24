@@ -36,6 +36,7 @@ const BasketSchema = new Schema(
           },
         },
       ],
+      default: [],
     },
     stock: {
       type: Number,

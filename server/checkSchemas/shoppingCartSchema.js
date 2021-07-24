@@ -1,15 +1,4 @@
-const shoppingCartSchema = {
-  products: {
-    optional: true,
-    isArray: true,
-    errorMessage: "Els productes no són correctes",
-  },
-  price: {
-    optional: true,
-    isNumeric: true,
-    errorMessage: "El preu no és correcte",
-  },
-};
+const shoppingCartSchema = {};
 
 const shoppingCartProductSchema = {
   amount: {
@@ -22,4 +11,15 @@ const shoppingCartProductSchema = {
   },
 };
 
-module.exports = { shoppingCartSchema, shoppingCartProductSchema };
+const shoppingCartProductRemoveSchema = {
+  isBasket: {
+    isBoolean: true,
+    errorMessage: "S'ha d'indicar si s'està afegint un producte o una cistella",
+  },
+};
+
+module.exports = {
+  shoppingCartSchema,
+  shoppingCartProductSchema,
+  shoppingCartProductRemoveSchema,
+};
