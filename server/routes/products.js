@@ -64,14 +64,13 @@ router.get("/list-by-field/:field", async (req, res, next) => {
 });
 
 router.get(
-  "/list-recommended/:userId",
-  authorization(false),
-  check("userId", "Id incorrecta").isMongoId(),
+  "/list-recommended/:productId",
+  check("productId", "Id incorrecta").isMongoId(),
   validationErrors,
   async (req, res, next) => {
-    const { id } = req.params;
+    const { productId } = req.params;
     try {
-      const productsList = await listRecommendedProducts(id);
+      const productsList = await listRecommendedProducts(productId);
       res.json(productsList);
     } catch (error) {
       next(error);
