@@ -41,6 +41,7 @@ const userSchema = {
     errorMessage: "Adreça incorrecta",
   },
   isAdmin: {
+    optional: true,
     isBoolean: true,
     errorMessage: "S'ha d'indicar si l'usuari és administrador o no",
   },
