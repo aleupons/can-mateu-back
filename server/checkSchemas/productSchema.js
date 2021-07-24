@@ -1,10 +1,16 @@
 const productSchema = {
   name: {
-    matches: /^[a-zA-Z ]*$/,
+    notEmpty: true,
+    matches: {
+      options: [/^[A-Za-zÀ-ÖØ-öø-ÿ ]*$/],
+    },
     errorMessage: "El nom només pot contenir lletres",
   },
   description: {
-    matches: /^[a-zA-Z ]*$/,
+    notEmpty: true,
+    matches: {
+      options: [/^[A-Za-zÀ-ÖØ-öø-ÿ ]*$/],
+    },
     errorMessage: "La descripció només pot contenir lletres",
   },
   stock: {
