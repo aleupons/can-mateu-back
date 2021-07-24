@@ -63,21 +63,27 @@ const listDataAndOrderBy = async (field, model, modelName) => {
   }
 };
 
-const listRecommended = async (userId, model, modelName) => {
+const listRecommended = async (docId, model, modelName) => {
   try {
-    const list = await model.find().limit(8);
-    if (list.length === 0) {
+    const register = await model.findOne({ _id: docId });
+    const products = await model
+      .find({ category: register.category })
+      .limit(4)
+      .sort({
+        name: "asc",
+      });
+    if (products.length === 0) {
       const newError = generateError(
         `No hi ha cap ${modelName} per recomanar`,
         404
       );
       throw newError;
     }
-    return list;
+    return products;
   } catch (error) {
     const newError = error.statusCode
       ? error
-      : generateError(`No es poden llistar ${modelName}`, 404);
+      : generateError(`No es poden llistar ${modelName} per recomanar`, 404);
     throw newError;
   }
 };

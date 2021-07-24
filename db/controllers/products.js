@@ -18,8 +18,8 @@ const listProductsByCategory = async (category) =>
   listDataByCategory(category, model, modelName);
 const listProductsAndOrderBy = async (field) =>
   listDataAndOrderBy(field, model, modelName);
-const listRecommendedProducts = async (userId) =>
-  listRecommended(userId, model, modelName);
+const listRecommendedProducts = async (productId) =>
+  listRecommended(productId, model, modelName);
 
 const showProduct = async (productId) => read(productId, model, modelName);
 const createProduct = async (newProduct) =>
