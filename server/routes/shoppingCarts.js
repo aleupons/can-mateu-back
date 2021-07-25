@@ -59,13 +59,17 @@ router.post(
   async (req, res, next) => {
     const { userId } = req;
     try {
+      if (userId) {
+        throw generateError(
+          "Aquest usuari ja està registrat i té un carro de la compra",
+          400
+        );
+      }
       const newShoppingCart = await createShoppingCart({
         userId: userId || undefined,
       });
-      if (!userId) {
-        localStorage.removeItem("shoppingCartId");
-        localStorage.setItem("shoppingCartId", newShoppingCart._id);
-      }
+      localStorage.removeItem("shoppingCartId");
+      localStorage.setItem("shoppingCartId", newShoppingCart._id);
       res.status(201).json(newShoppingCart);
     } catch (error) {
       duplicateKeyError(req, res, next, error);
