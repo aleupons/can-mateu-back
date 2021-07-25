@@ -43,7 +43,7 @@ router.get("/shopping-cart", getToken(), async (req, res, next) => {
     }
     const shoppingCarts = await listShoppingCarts();
     const shoppingCart = await shoppingCarts.find(({ userId }) =>
-      userId._id.equals(id)
+      userId ? userId._id.equals(id) : false
     );
     res.json(shoppingCart);
   } catch (error) {
@@ -255,8 +255,10 @@ router.put("/empty-shopping-cart", getToken(), async (req, res, next) => {
   try {
     if (userId) {
       const shoppingCarts = await listShoppingCarts();
-      const shoppingCart = await shoppingCarts.find((existShoppingCart) =>
-        existShoppingCart.userId._id.equals(userId)
+      const shoppingCart = await shoppingCarts.find((existsShoppingCart) =>
+        existsShoppingCart.userId
+          ? existsShoppingCart.userId._id.equals(userId)
+          : false
       );
       const emptyShoppingCart = await modifyShoppingCart(shoppingCart._id, {
         products: [],
@@ -280,24 +282,28 @@ router.put("/empty-shopping-cart", getToken(), async (req, res, next) => {
   }
 });
 
-router.delete(
-  "/shopping-cart/:userId",
-  authorization(true),
-  check("id", "Id incorrecta").isMongoId(),
-  validationErrors,
-  async (req, res, next) => {
-    const { userId: id } = req.params;
-    try {
+router.delete("/shopping-cart", getToken(), async (req, res, next) => {
+  const { userId } = req;
+  try {
+    if (userId) {
       const shoppingCarts = await listShoppingCarts();
-      const shoppingCartId = await shoppingCarts.find(({ userId }) =>
-        userId.equals(id)
+      const shoppingCart = await shoppingCarts.find((existsShoppingCart) =>
+        existsShoppingCart.userId
+          ? existsShoppingCart.userId._id.equals(userId)
+          : false
       );
-      const shoppingCart = await deleteShoppingCart(shoppingCartId);
-      res.json(shoppingCart);
-    } catch (error) {
-      next(error);
+      const deletedShoppingCart = await deleteShoppingCart(shoppingCart._id);
+      res.status(201).json(deletedShoppingCart);
+    } else {
+      const shoppingCartId = await showShoppingCart(
+        localStorage.getItem("shoppingCartId")
+      );
+      const deletedShoppingCart = await deleteShoppingCart(shoppingCartId);
+      res.status(201).json(deletedShoppingCart);
     }
+  } catch (error) {
+    duplicateKeyError(req, res, next, error);
   }
-);
+});
 
 module.exports = router;
