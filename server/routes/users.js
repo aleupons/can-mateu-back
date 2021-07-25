@@ -94,7 +94,7 @@ router.post(
   validationErrors,
   async (req, res, next) => {
     const user = req.body;
-    const shoppingCartId = localStorage.getItem("shoppingCartId");
+    const { shoppingCartId } = user;
     try {
       const newUser = await createUser(user);
       if (shoppingCartId) {
@@ -104,7 +104,6 @@ router.post(
         );
         shoppingCart.userId = newUser._id;
         await modifyShoppingCart(shoppingCartId, shoppingCart);
-        localStorage.removeItem("shoppingCartId");
       }
       res.status(201).json(newUser);
     } catch (error) {
