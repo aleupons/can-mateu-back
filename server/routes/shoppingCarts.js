@@ -55,7 +55,7 @@ router.get(
     try {
       const shoppingCarts = await listShoppingCarts();
       const myShoppingCart = shoppingCarts.find((shoppingCart) =>
-        shoppingCart.userId ? shoppingCart.userId === userId : false
+        shoppingCart.userId ? shoppingCart.userId._id.equals(userId) : false
       );
       res.json(myShoppingCart);
     } catch (error) {
