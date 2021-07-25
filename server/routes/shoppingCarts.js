@@ -35,9 +35,12 @@ router.get("/list", authorization(true), async (req, res, next) => {
 
 router.get("/shopping-cart", getToken(), async (req, res, next) => {
   const { userId: id } = req;
+  const { shoppingCartId } = req.body;
   try {
     if (!id) {
-      const shoppingCartId = localStorage.getItem("shoppingCartId");
+      if (!shoppingCartId) {
+        throw generateError("Falta la id del carro (usuari no registrat)", 400);
+      }
       const shoppingCart = await showShoppingCart(shoppingCartId);
       return res.json(shoppingCart);
     }
@@ -68,8 +71,6 @@ router.post(
       const newShoppingCart = await createShoppingCart({
         userId: userId || undefined,
       });
-      localStorage.removeItem("shoppingCartId");
-      localStorage.setItem("shoppingCartId", newShoppingCart._id);
       res.status(201).json(newShoppingCart);
     } catch (error) {
       duplicateKeyError(req, res, next, error);
@@ -88,7 +89,7 @@ router.put(
   async (req, res, next) => {
     const { userId } = req;
     const { productId } = req.params;
-    const { amount, isBasket } = req.body;
+    const { amount, isBasket, shoppingCartId } = req.body;
     let shoppingCart = {};
     try {
       if (userId) {
@@ -99,7 +100,12 @@ router.put(
             : false
         );
       } else {
-        const shoppingCartId = localStorage.getItem("shoppingCartId");
+        if (!shoppingCartId) {
+          throw generateError(
+            "Falta la id del carro (usuari no registrat)",
+            400
+          );
+        }
         shoppingCart = await showShoppingCart(shoppingCartId);
       }
       if (shoppingCart) {
@@ -188,7 +194,7 @@ router.put(
   async (req, res, next) => {
     const { userId } = req;
     const { productId } = req.params;
-    const { isBasket } = req.body;
+    const { isBasket, shoppingCartId } = req.body;
     let shoppingCart = {};
     try {
       if (userId) {
@@ -199,7 +205,12 @@ router.put(
             : false
         );
       } else {
-        const shoppingCartId = localStorage.getItem("shoppingCartId");
+        if (!shoppingCartId) {
+          throw generateError(
+            "Falta la id del carro (usuari no registrat)",
+            400
+          );
+        }
         shoppingCart = await showShoppingCart(shoppingCartId);
       }
       if (shoppingCart) {
@@ -256,6 +267,7 @@ router.put(
 
 router.put("/empty-shopping-cart", getToken(), async (req, res, next) => {
   const { userId } = req;
+  const { shoppingCartId } = req.body;
   try {
     if (userId) {
       const shoppingCarts = await listShoppingCarts();
@@ -271,9 +283,10 @@ router.put("/empty-shopping-cart", getToken(), async (req, res, next) => {
       });
       res.status(201).json(emptyShoppingCart);
     } else {
-      const shoppingCart = await showShoppingCart(
-        localStorage.getItem("shoppingCartId")
-      );
+      if (!shoppingCartId) {
+        throw generateError("Falta la id del carro (usuari no registrat)", 400);
+      }
+      const shoppingCart = await showShoppingCart(shoppingCartId);
       const emptyShoppingCart = await modifyShoppingCart(shoppingCart._id, {
         products: [],
         price: 0,
@@ -288,6 +301,7 @@ router.put("/empty-shopping-cart", getToken(), async (req, res, next) => {
 
 router.delete("/shopping-cart", getToken(), async (req, res, next) => {
   const { userId } = req;
+  const { shoppingCartId } = req.body;
   try {
     if (userId) {
       const shoppingCarts = await listShoppingCarts();
@@ -299,9 +313,9 @@ router.delete("/shopping-cart", getToken(), async (req, res, next) => {
       const deletedShoppingCart = await deleteShoppingCart(shoppingCart._id);
       res.status(201).json(deletedShoppingCart);
     } else {
-      const shoppingCartId = await showShoppingCart(
-        localStorage.getItem("shoppingCartId")
-      );
+      if (!shoppingCartId) {
+        throw generateError("Falta la id del carro (usuari no registrat)", 400);
+      }
       const deletedShoppingCart = await deleteShoppingCart(shoppingCartId);
       res.status(201).json(deletedShoppingCart);
     }
