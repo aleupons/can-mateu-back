@@ -47,6 +47,23 @@ router.get(
   }
 );
 
+router.get(
+  "/my-shopping-cart",
+  authorization(false),
+  async (req, res, next) => {
+    const { userId } = req;
+    try {
+      const shoppingCarts = await listShoppingCarts();
+      const myShoppingCart = shoppingCarts.find((shoppingCart) =>
+        shoppingCart.userId ? shoppingCart.userId === userId : false
+      );
+      res.json(myShoppingCart);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 router.post(
   "/new-shopping-cart",
   checkSchema(shoppingCartSchema),
