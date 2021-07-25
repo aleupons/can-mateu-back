@@ -33,26 +33,19 @@ router.get("/list", authorization(true), async (req, res, next) => {
   }
 });
 
-router.get("/shopping-cart", getToken(), async (req, res, next) => {
-  const { userId: id } = req;
-  const { shoppingCartId } = req.body;
-  try {
-    if (!id) {
-      if (!shoppingCartId) {
-        throw generateError("Falta la id del carro (usuari no registrat)", 400);
-      }
+router.get(
+  "/shopping-cart/:shoppingCartId",
+  check("productId", "Id incorrecta").isMongoId(),
+  async (req, res, next) => {
+    const { shoppingCartId } = req.params;
+    try {
       const shoppingCart = await showShoppingCart(shoppingCartId);
-      return res.json(shoppingCart);
+      res.json(shoppingCart);
+    } catch (error) {
+      next(error);
     }
-    const shoppingCarts = await listShoppingCarts();
-    const shoppingCart = await shoppingCarts.find(({ userId }) =>
-      userId ? userId._id.equals(id) : false
-    );
-    res.json(shoppingCart);
-  } catch (error) {
-    next(error);
   }
-});
+);
 
 router.post(
   "/new-shopping-cart",
