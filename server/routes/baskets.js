@@ -144,6 +144,34 @@ router.put(
   }
 );
 
+/* MODIFICAR SENSE MODIFICAR IMATGE */
+
+router.put(
+  "/basket-no-image/:id",
+  authorization(true),
+  check("id", "Id incorrecta").isMongoId(),
+  checkSchema(basketSchema),
+  validationErrors,
+  async (req, res, next) => {
+    const { id } = req.params;
+    const basket = req.body;
+    try {
+      const date = new Date();
+      if (basket.discount !== 0) {
+        basket.newPrice =
+          basket.priceUnit - (basket.discount / 100) * basket.priceUnit;
+      }
+      const modifiedBasket = { ...basket, date };
+      const newBasket = await modifyBasket(modifiedBasket);
+      res.json(newBasket);
+    } catch (error) {
+      duplicateKeyError(req, res, next, error);
+    }
+  }
+);
+
+/* */
+
 /* AFEGIR O TREURE PRODUCTES DE LA CISTELLA */
 
 router.put(

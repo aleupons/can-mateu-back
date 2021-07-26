@@ -141,6 +141,34 @@ router.put(
   }
 );
 
+/* MODIFICAR SENSE MODIFICAR IMATGE */
+
+router.put(
+  "/product-no-image/:id",
+  authorization(true),
+  check("id", "Id incorrecta").isMongoId(),
+  checkSchema(productSchema),
+  validationErrors,
+  async (req, res, next) => {
+    const { id } = req.params;
+    const product = req.body;
+    try {
+      const date = new Date();
+      if (product.discount !== 0) {
+        product.newPrice =
+          product.priceUnit - (product.discount / 100) * product.priceUnit;
+      }
+      const modifiedProduct = { ...product, date };
+      const newProduct = await modifyProduct(modifiedProduct);
+      res.json(newProduct);
+    } catch (error) {
+      duplicateKeyError(req, res, next, error);
+    }
+  }
+);
+
+/* */
+
 router.delete(
   "/product/:id",
   authorization(true),
