@@ -44,6 +44,16 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
+router.post("/password", async (req, res, next) => {
+  const { username, password } = req.body;
+  try {
+    const { userId, admin } = await loginUser(username, password);
+    res.json({ userId, admin });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/list-admins", authorization(true), async (req, res, next) => {
   try {
     const adminsList = await listAdminUsers();
