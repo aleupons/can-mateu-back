@@ -9,7 +9,7 @@ const basketSchema = {
   description: {
     notEmpty: true,
     matches: {
-      options: [/^[A-Za-zÀ-ÖØ-öø-ÿ.,0-9/\-!?¿¡ ]*$/],
+      options: [/^[A-Za-zÀ-ÖØ-öø-ÿ.,0-9/\-!?¿¡' ]*$/],
     },
     errorMessage: "La descripció només pot contenir lletres",
   },
@@ -51,7 +51,7 @@ const basketProductSchema = {
     errorMessage: "El nom només pot contenir lletres",
   },
   description: {
-    options: [/^[A-Za-zÀ-ÖØ-öø-ÿ.,0-9/\-!?¿¡ ]*$/],
+    options: [/^[A-Za-zÀ-ÖØ-öø-ÿ.,0-9/\-!?¿¡' ]*$/],
     errorMessage: "La descripció només pot contenir lletres",
   },
   amount: {

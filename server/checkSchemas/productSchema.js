@@ -9,7 +9,7 @@ const productSchema = {
   description: {
     notEmpty: true,
     matches: {
-      options: [/^[A-Za-zÀ-ÖØ-öø-ÿ.,0-9/\-!?¿¡ ]*$/],
+      options: [/^[A-Za-zÀ-ÖØ-öø-ÿ.,0-9/\-!?¿¡' ]*$/],
     },
     errorMessage:
       "La descripció només pot contenir lletres, números i signes de puntuació",
