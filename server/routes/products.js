@@ -159,7 +159,7 @@ router.put(
           product.priceUnit - (product.discount / 100) * product.priceUnit;
       }
       const modifiedProduct = { ...product, date };
-      const newProduct = await modifyProduct(modifiedProduct);
+      const newProduct = await modifyProduct(id, modifiedProduct);
       res.json(newProduct);
     } catch (error) {
       duplicateKeyError(req, res, next, error);

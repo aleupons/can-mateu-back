@@ -162,7 +162,7 @@ router.put(
           basket.priceUnit - (basket.discount / 100) * basket.priceUnit;
       }
       const modifiedBasket = { ...basket, date };
-      const newBasket = await modifyBasket(modifiedBasket);
+      const newBasket = await modifyBasket(id, modifiedBasket);
       res.json(newBasket);
     } catch (error) {
       duplicateKeyError(req, res, next, error);
